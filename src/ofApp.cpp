@@ -46,7 +46,7 @@ void ofApp::setup(){
     versesImg[5].load("Strophen/6.png");
         
     float imgScaleFac = 5;
-    particleResolution = 5;
+    particleResolution = 10;
 
     
     for (int i = 0; i<versesImg.size(); i++){
@@ -173,21 +173,27 @@ void ofApp::update(){
 //
     for(unsigned int i = 0; i < p1.size(); i++){
         p1[i].update();
+        p1[i].addBlinky(100);
     }
     for(unsigned int i = 0; i < p2.size(); i++){
         p2[i].update();
+        p2[i].addBlinky(100);
     }
     for(unsigned int i = 0; i < p3.size(); i++){
         p3[i].update();
+        p3[i].addBlinky(100);
     }
     for(unsigned int i = 0; i < p4.size(); i++){
         p4[i].update();
+        p4[i].addBlinky(100);
     }
     for(unsigned int i = 0; i < p5.size(); i++){
         p5[i].update();
+        p5[i].addBlinky(100);
     }
     for(unsigned int i = 0; i < p6.size(); i++){
         p6[i].update();
+        p6[i].addBlinky(100);
     }
     
 //    for(unsigned int i = 0; i < p.size(); i++){

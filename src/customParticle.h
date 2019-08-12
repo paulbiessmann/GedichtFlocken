@@ -34,6 +34,9 @@ public:
     void setParticleSize(int thisParticleSize);
     void setParticleImg(ofImage image);
     void setGlobalPos(ofVec3f _xyz);
+    
+    void addBlinky(float blinkyness);
+
     void reset();
     void update();
     void draw();
@@ -57,11 +60,15 @@ public:
     
     int particleSize = 3;
     
-    //particleDrawMode drawMode = PARTICLE_MODE_POINTS;
-    particleDrawMode drawMode = PARTICLE_MODE_TEXTURES;
+    particleDrawMode drawMode = PARTICLE_MODE_POINTS;
+    //particleDrawMode drawMode = PARTICLE_MODE_TEXTURES;
     
-    int fullWidth = 3840;
-    int fullHeight = 2160;
+  //  int fullWidth = 3840;
+   // int fullHeight = 2160;
+    
+    int fullWidth = 1920;
+    int fullHeight = 1080;
+    
     
     float startingTimef;
     

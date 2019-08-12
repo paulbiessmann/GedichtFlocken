@@ -80,7 +80,9 @@ class ofApp : public ofBaseApp{
     ofShader    shaderGlitch;
     ofFbo       screenData;
     
-    int fullWidth = 3840;
-    int fullHeight = 2160;
+//    int fullWidth = 3840;
+//    int fullHeight = 2160;
+    int fullWidth = 1920;
+    int fullHeight = 1080;
     
 };

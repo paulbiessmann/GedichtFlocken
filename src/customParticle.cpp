@@ -101,45 +101,47 @@ void customParticle::update(){
     float fakeWindX = ofSignedNoise(pos.x * 0.003, pos.y * 0.006, relTimef * 0.6);
 
     frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
-    frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
     
     friction = 0.39;
-    
-    if(pos.z < -1){
-        
-        frc.x *= 0.2;
-        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.09 + 0.15;
-        frc.y = - frc.y;
-    }
+    if(relTimef < 5 ){
+        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
+        if(pos.z < -1){
+            frc.x *= 0.2;
+            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.09 + 0.15;
+            frc.y = - frc.y;
+        }
 
-    if(pos.y < 1000){
-        frc.z = -abs(frc.z);
-        frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
-        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.35;
-
-
-    }
-    else if(pos.y > 1500){
-        friction = 0.99;
-        frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.05 + 0.5;
-        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.8;
-
+        if(pos.y < 1000){
+            frc.z = -abs(frc.z);
+            frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
+            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.35;
+        }
+        else if(pos.y > 1500){
+            friction = 0.99;
+            frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.05 + 0.5;
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.8;
+        }
+        else{
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.02) * 0.09 + 0.01;
+        }
     }
     else{
-        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.02) * 0.09 + 0.01;
+        frc.x = ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 0.5 + 0.5;
+        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
+        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.35;
+
     }
-  
     
     vel *= drag;
     vel += frc * 0.4 * (1.0 - friction);
 
     //we do this so as to skip the bounds check for the bottom and make the particles go back to the top of the screen
-    if( pos.y + vel.y > fullHeight ){
-        pos.y -= fullHeight;
-    }
-    if( pos.x + vel.x > fullWidth ){
-        pos.x -= fullWidth;
-    }
+//    if( pos.y + vel.y > fullHeight ){
+//        pos.y -= fullHeight;
+//    }
+//    if( pos.x + vel.x > fullWidth  ){
+//        pos.x -= fullWidth;
+//    }
 
     //2 - UPDATE OUR POSITION
     pos += vel;
@@ -147,11 +149,11 @@ void customParticle::update(){
 
     //3 - (optional) LIMIT THE PARTICLES TO STAY ON SCREEN
     //we could also pass in bounds to check - or alternatively do this at the ofApp level
-    if( pos.x > fullWidth ){
-        pos.x = fullWidth;
+    if( pos.x + pos.z > fullWidth ){
+        pos.x = fullWidth + pos.z;
         vel.x *= -1.0;
-    }else if( pos.x < 0 ){
-        pos.x = 0;
+    }else if( pos.x - pos.z < 0 ){
+        pos.x = 0 + pos.z;
         vel.x *= -1.0;
     }
     if( pos.y > fullHeight ){
@@ -167,6 +169,8 @@ void customParticle::update(){
 //    if(pos.z > 100){
 //        vel.z = 0;
 //    }
+    
+
 }
 
 
@@ -191,6 +195,11 @@ void customParticle::draw(){
 //------------------------------------------------------------------
 void customParticle::setColor(ofColor thisColor){
     
+    //blinky
+    if(0){
+        float newAlpha = sin(ofGetElapsedTimef() * 100 + uniqueVal )* 100 + 150;
+        thisColor.r = newAlpha;
+    }
     
     if(thisColor != NULL){
         customColor = thisColor;
@@ -199,14 +208,28 @@ void customParticle::setColor(ofColor thisColor){
         customColor = ofColor(255,255,255,200);
     }
     
+}
+
+
+//------------------------------------------------------------------
+void customParticle::addBlinky(float blinkyness){
     
+    ofColor color = customColor;
+    
+    color.a = abs(ofNoise(ofGetElapsedTimef() * 2 + uniqueVal) * blinkyness) + blinkyness;
+    
+    customColor = color;
+
 }
 
 //------------------------------------------------------------------
 void customParticle::setParticleImg(ofImage thisImage){
     
+
+    
     particleTexture = thisImage;
     
+    ofSetColor(255);
 }
 
 

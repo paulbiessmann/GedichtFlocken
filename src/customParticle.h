@@ -30,7 +30,7 @@ public:
     void getImage();
     void setColor(ofColor color);
     void setPos(ofVec3f position);
-    void setStartingTime(float _time);
+    void setStartingTime(float _time, int _frameNum);
     void setParticleSize(int thisParticleSize);
     void setParticleImg(ofImage image);
     void setGlobalPos(ofVec3f _xyz);
@@ -63,13 +63,14 @@ public:
     particleDrawMode drawMode = PARTICLE_MODE_POINTS;
     //particleDrawMode drawMode = PARTICLE_MODE_TEXTURES;
     
-  //  int fullWidth = 3840;
-   // int fullHeight = 2160;
-    
+//    int fullWidth = 3840;
+//    int fullHeight = 2160;
+//    
     int fullWidth = 1920;
     int fullHeight = 1080;
-    
-    
-    float startingTimef;
+
+    int     startingFrame;
+   // int     relFrameNum;
+    float   startingTimef;
     
 };

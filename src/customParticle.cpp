@@ -25,8 +25,10 @@ void customParticle::setDrawMode(particleDrawMode newDrawMode){
 }
 
 //------------------------------------------------------------------
-void customParticle::setStartingTime(float _time){
+void customParticle::setStartingTime(float _time, int _frameNum){
     startingTimef = _time;
+    
+    startingFrame = _frameNum;
 }
 
 //------------------------------------------------------------------
@@ -94,6 +96,7 @@ void customParticle::setGlobalPos(ofVec3f _xyz){
 void customParticle::update(){
     
     float relTimef = ofGetElapsedTimef() - startingTimef;
+    float relFrameNum = ofGetFrameNum() - startingFrame;
 
     //lets simulate falling snow
     //the fake wind is meant to add a shift to the particles based on where in x they are
@@ -103,7 +106,7 @@ void customParticle::update(){
     frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
     
     friction = 0.39;
-    if(relTimef < 5 ){
+    if(relFrameNum > (25 * 10) ){
         frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
         if(pos.z < -1){
             frc.x *= 0.2;
@@ -112,23 +115,24 @@ void customParticle::update(){
         }
 
         if(pos.y < 1000){
-            frc.z = -abs(frc.z);
+            frc.z = -abs(frc.z) * 4;
             frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
-            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.35;
+            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.65;
         }
         else if(pos.y > 1500){
-            friction = 0.99;
+            friction = 0.89;
             frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.05 + 0.5;
-            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.8;
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.5;
         }
         else{
+            frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.02) * 0.09 + 0.01;
         }
     }
     else{
-        frc.x = ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 0.5 + 0.5;
+        frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
         frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
-        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.35;
+        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
 
     }
     
@@ -156,19 +160,19 @@ void customParticle::update(){
         pos.x = 0 + pos.z;
         vel.x *= -1.0;
     }
-    if( pos.y > fullHeight ){
-        pos.y = fullHeight;
+    if( pos.y + pos.z > fullHeight ){
+        pos.y = fullHeight + pos.z;
         vel.y *= -1.0;
     }
-    else if( pos.y < 0 ){
-        pos.y = 0;
+    else if( pos.y - pos.z< 0 ){
+        pos.y = 0  + pos.z;
         vel.y *= -1.0;
     }
     
 
-//    if(pos.z > 100){
-//        vel.z = 0;
-//    }
+    if(pos.z > 100){
+        vel.z = -4;
+    }
     
 
 }

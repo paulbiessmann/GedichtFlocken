@@ -28,7 +28,7 @@ void ofApp::setup(){
     recordFboFlip.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
     bRecording = false;
     
-   // keyReleased('r');
+  //  keyReleased('r');
 
 /** end recording **/
     
@@ -46,7 +46,7 @@ void ofApp::setup(){
     versesImg[5].load("Strophen/6.png");
         
     float imgScaleFac = 5;
-    particleResolution = 10;
+    particleResolution = 20;
 
     
     for (int i = 0; i<versesImg.size(); i++){
@@ -89,7 +89,7 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
         for(unsigned int i = 0; i < textWidth - particleResolution; i += particleResolution){
             for(unsigned int j = 0; j < textHeight - particleResolution; j += particleResolution){
     
-                pThis[pCount].setStartingTime(ofGetElapsedTimef()+2.0);
+                pThis[pCount].setStartingTime(ofGetElapsedTimef()+2.0, ofGetFrameNum());
                 
                 ofColor pxColor = pixels.getColor(i, j);
     
@@ -105,7 +105,7 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
         for(unsigned int i = 0; i <= textWidth-particleResolution ; i += particleResolution){
             for(unsigned int j = 0; j <= textHeight-particleResolution; j += particleResolution){
                 
-                pThis[pCount].setStartingTime(ofGetElapsedTimef() + 2.0);
+                pThis[pCount].setStartingTime(ofGetElapsedTimef() + 2.0, ofGetFrameNum());
 
                 ofColor pxColor = pixels.getColor(i, j);
                 ofImage pxImage = imgThis;
@@ -225,7 +225,10 @@ void ofApp::draw(){
     float t = ofGetElapsedTimef();
    
     if(0){
-    cout << "frame " << ofGetFrameNum() << "\n";
+        cout << "frame " << ofGetFrameNum() << "\n";
+    }
+    if(0){
+        cout << "sec " << ofGetElapsedTimef() << "\n";
     }
     
     if(ofGetFrameNum() < 20  ){
@@ -235,7 +238,7 @@ void ofApp::draw(){
         versesImg[3].draw(vPosVerse[3]);
         versesImg[4].draw(vPosVerse[4]);
         versesImg[5].draw(vPosVerse[5]);
-    }else{
+    }else if(ofGetFrameNum() > 18 ){
         if(!bInit){
             initParticles(p1, versesImg[0]);
             initParticles(p2, versesImg[1]);

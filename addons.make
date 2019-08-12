@@ -1,0 +1,3 @@
+ofxDOF
+ofxPostProcessing
+ofxVideoRecorder

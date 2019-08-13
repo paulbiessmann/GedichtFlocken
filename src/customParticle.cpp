@@ -74,7 +74,7 @@ void customParticle::reset(){
     else if(pMode == PARTICLE_MODE_SNOW){
         
         pos.x = ofRandom(0, fullWidth);
-        pos.y = ofRandom(fullHeight, fullHeight - 500);
+        pos.y = ofRandom(fullHeight, fullHeight - 500 - ofRandom(100));
         pos.z = -10;
         
         globalPos = ofVec3f(0,0,0);
@@ -84,12 +84,12 @@ void customParticle::reset(){
         vel.z = 0;
         frc   = ofPoint(0,0,0);
         
-        rotation    = 0;
+        rotation    = 0;//ofRandom(-180,180);
         rotFrc      = 0.1;
         friction    = 0.4;
         
     }
-    customColor = ofColor(255,255,255);
+    customColor = ofColor(255,255,255,255);
 }
 
 //------------------------------------------------------------------
@@ -141,7 +141,7 @@ void customParticle::update(){
     if(pMode == PARTICLE_MODE_EXPLODE){
         frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
         
-        friction = 0.39;
+        friction = 0.29;
         if(relFrameNum > (25 * 10) ){
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
             if(pos.z < -1){
@@ -156,7 +156,7 @@ void customParticle::update(){
                 frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.65;
             }
             else if(pos.y > 1500){
-                friction = 0.89;
+                friction = 0.49;
                 frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.05 + 0.5;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.5;
             }
@@ -166,7 +166,7 @@ void customParticle::update(){
             }
         }
         else{
-            frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
+            frc.x = ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
             frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
 
@@ -225,15 +225,15 @@ void customParticle::update(){
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.15;
         }
         else{
-            frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
+            frc.x = ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.18;
             frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
         }
         
         
         drag  = ofRandom(0.40, 0.99);
-        vel *= drag;
-        vel += frc * 0.4 * (1.0 - friction);
+        vel *= drag * 1.3;
+        vel += frc * 0.6 * (1.0 - friction);
         
         //2 - UPDATE OUR POSITION
         pos += vel;
@@ -326,6 +326,8 @@ void customParticle::addBlinky(float blinkyness){
     ofColor color = customColor;
     
     color.a = abs(ofNoise(ofGetElapsedTimef() * 2 + uniqueVal) * blinkyness) + blinkyness;
+    
+ //   color.a -= ofMap(pos.z, 0, 255, 0, 2000);
     
     customColor = color;
 

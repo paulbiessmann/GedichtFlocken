@@ -77,11 +77,10 @@ public:
     
     particleMode        pMode = PARTICLE_MODE_SNOW;
     
-//    int fullWidth = 3840;
-//    int fullHeight = 2160;
-//    
-    int fullWidth = 1920;
-    int fullHeight = 1080;
+    int fullWidth = 3840;
+    int fullHeight = 2160;    
+ //   int fullWidth = 1920;
+//    int fullHeight = 1080;
 
     int     startingFrame;
    // int     relFrameNum;

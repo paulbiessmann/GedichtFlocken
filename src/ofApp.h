@@ -5,6 +5,11 @@
 #include "ofxPostProcessing.h"
 #include "ofxVideoRecorder.h"
 
+enum sceneMode{
+    MODE_EXPLODE,
+    MODE_SNOW,
+    MODE_TEX_GLITCH
+};
 
 class ofApp : public ofBaseApp{
   public:
@@ -15,6 +20,8 @@ class ofApp : public ofBaseApp{
     
     void resetParticles();
     void initParticles(vector <customParticle>  &pThis, ofImage &imgThis);
+    void initFullTexParticles(vector <customParticle> &pThis, vector <ofImage> &imgThis);
+
 	
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -57,6 +64,9 @@ class ofApp : public ofBaseApp{
     
     int particleResolution;
     
+    bool    bInitSchnipsel;
+    int     numFullTexParticles;
+    vector <ofImage> schnipselImgs;
     vector <ofImage> versesImg;
     
     ofImage kuppelGrid;
@@ -75,6 +85,7 @@ class ofApp : public ofBaseApp{
     
     void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
     
+    sceneMode mode;
     
 	// shader glitch
     ofShader    shaderGlitch;

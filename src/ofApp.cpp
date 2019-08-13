@@ -8,7 +8,7 @@ void ofApp::setup(){
     ofSetBackgroundColor(255);
     ofEnableAlphaBlending();
     
-    
+    mode = MODE_SNOW;
     
 /************ Video Record *********/
     ofSetFrameRate((int) fps);
@@ -67,13 +67,54 @@ void ofApp::setup(){
     p4.assign(vNum[3], customParticle());
     p5.assign(vNum[4], customParticle());
     p6.assign(vNum[5], customParticle());
-
+    
+    
+    float fullTexScaleFac       = 15;
+    numFullTexParticles         = 200;
+    
+    int numSchnipsel            = 30;
+    p.assign(numFullTexParticles, customParticle());
+    schnipselImgs.resize(numSchnipsel);
+    
+    for (int i=0; i<numSchnipsel; i++){
+        schnipselImgs[i].load("Schnipsel/s" + ofToString(i+1) + ".png");
+        
+        int oldWidth   = schnipselImgs[i].getWidth();
+        int oldHeight  = schnipselImgs[i].getHeight();
+        schnipselImgs[i].resize(oldWidth/fullTexScaleFac, oldHeight/fullTexScaleFac);
+    }
+    
     resetParticles();
+
+    bInitSchnipsel = false;
+    if(!bInitSchnipsel){
+        initFullTexParticles(p, schnipselImgs);
+        bInitSchnipsel = true;
+    }
 
     
 /*  shader glitch  */
    // shaderGlitch.load("glitch1Shader");
     
+}
+//--------------------------------------------------------------
+void ofApp::initFullTexParticles(vector <customParticle> &pThis, vector <ofImage> &imgThis){
+    
+    int numImages = imgThis.size();
+    int particleSizeMax = 100; // Pixelsize of Particles
+    
+   // if(mode == MODE_SNOW){
+        for(unsigned int i=0; i < pThis.size(); i++){
+            int randNum = ofRandom(numImages);
+            int imgWidth = imgThis[randNum].getWidth();
+            int imgHeight = imgThis[randNum].getHeight();
+            pThis[i].setParticleImg(imgThis[randNum]);
+            pThis[i].setParticleSize(imgWidth, imgHeight);
+            pThis[i].setDrawMode(PARTICLE_MODE_TEXTURES);
+            pThis[i].setParticleMode(PARTICLE_MODE_SNOW);
+        }
+   // }
+
 }
 //--------------------------------------------------------------
 void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
@@ -127,32 +168,40 @@ void ofApp::resetParticles(){
     for(unsigned int i = 0; i < p1.size(); i++){
         p1[i].reset();
         p1[i].setGlobalPos(vPosVerse[0]);
+        p1[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
     for(unsigned int i = 0; i < p2.size(); i++){
         p2[i].reset();
         p2[i].setGlobalPos(vPosVerse[1]);
+        p2[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
     for(unsigned int i = 0; i < p3.size(); i++){
         p3[i].reset();
         p3[i].setGlobalPos(vPosVerse[2]);
+        p3[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
     for(unsigned int i = 0; i < p4.size(); i++){
         p4[i].reset();
         p4[i].setGlobalPos(vPosVerse[3]);
+        p4[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
     for(unsigned int i = 0; i < p5.size(); i++){
         p5[i].reset();
         p5[i].setGlobalPos(vPosVerse[4]);
+        p5[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
     for(unsigned int i = 0; i < p6.size(); i++){
         p6[i].reset();
         p6[i].setGlobalPos(vPosVerse[5]);
+        p6[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
     
     
-//    for(unsigned int i = 0; i < p.size(); i++){
-//        p[i].reset();
-//    }
+    for(unsigned int i = 0; i < p.size(); i++){
+        p[i].reset();
+        p[i].setGlobalPos(ofVec3f(0,0,0));
+        p[i].setDrawMode(PARTICLE_MODE_POINTS);
+    }
 }
 
 //--------------------------------------------------------------
@@ -171,34 +220,37 @@ void ofApp::update(){
 //        drawSize++;
 //    }
 //
-    for(unsigned int i = 0; i < p1.size(); i++){
-        p1[i].update();
-        p1[i].addBlinky(100);
+    if(mode == MODE_EXPLODE){
+        for(unsigned int i = 0; i < p1.size(); i++){
+            p1[i].update();
+            p1[i].addBlinky(100);
+        }
+        for(unsigned int i = 0; i < p2.size(); i++){
+            p2[i].update();
+            p2[i].addBlinky(100);
+        }
+        for(unsigned int i = 0; i < p3.size(); i++){
+            p3[i].update();
+            p3[i].addBlinky(100);
+        }
+        for(unsigned int i = 0; i < p4.size(); i++){
+            p4[i].update();
+            p4[i].addBlinky(100);
+        }
+        for(unsigned int i = 0; i < p5.size(); i++){
+            p5[i].update();
+            p5[i].addBlinky(100);
+        }
+        for(unsigned int i = 0; i < p6.size(); i++){
+            p6[i].update();
+            p6[i].addBlinky(100);
+        }
     }
-    for(unsigned int i = 0; i < p2.size(); i++){
-        p2[i].update();
-        p2[i].addBlinky(100);
+    else if(mode == MODE_SNOW){
+        for(unsigned int i = 0; i < p.size(); i++){
+            p[i].update();
+        }
     }
-    for(unsigned int i = 0; i < p3.size(); i++){
-        p3[i].update();
-        p3[i].addBlinky(100);
-    }
-    for(unsigned int i = 0; i < p4.size(); i++){
-        p4[i].update();
-        p4[i].addBlinky(100);
-    }
-    for(unsigned int i = 0; i < p5.size(); i++){
-        p5[i].update();
-        p5[i].addBlinky(100);
-    }
-    for(unsigned int i = 0; i < p6.size(); i++){
-        p6[i].update();
-        p6[i].addBlinky(100);
-    }
-    
-//    for(unsigned int i = 0; i < p.size(); i++){
-//        p[i].update();
-//    }
     
     recordFbo.getTexture().readToPixels(recordPixels);
     if(bRecording){
@@ -212,7 +264,8 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    
+    ofSetBackgroundColor(ofColor(255,255,255,255));
+
     recordFbo.begin();
     ofClear(0,0,0,255);
     ofSetBackgroundColor(ofColor(255,255,255,255));
@@ -231,42 +284,55 @@ void ofApp::draw(){
         cout << "sec " << ofGetElapsedTimef() << "\n";
     }
     
-    if(ofGetFrameNum() < 20  ){
-        versesImg[0].draw(vPosVerse[0]);
-        versesImg[1].draw(vPosVerse[1]);
-        versesImg[2].draw(vPosVerse[2]);
-        versesImg[3].draw(vPosVerse[3]);
-        versesImg[4].draw(vPosVerse[4]);
-        versesImg[5].draw(vPosVerse[5]);
-    }else if(ofGetFrameNum() > 18 ){
-        if(!bInit){
-            initParticles(p1, versesImg[0]);
-            initParticles(p2, versesImg[1]);
-            initParticles(p3, versesImg[2]);
-            initParticles(p4, versesImg[3]);
-            initParticles(p5, versesImg[4]);
-            initParticles(p6, versesImg[5]);
-            bInit = true;
+    if(mode == MODE_SNOW){
+//        if(!bInitSchnipsel){
+//            initFullTexParticles(p, schnipselImgs);
+//            bInitSchnipsel = true;
+//        }
+        
+        for(unsigned int i = 0; i < p.size()-1; i++){
+            p[i].draw();
         }
-        //versesImg[0].draw(0,0);
+    }
+    else if(mode == MODE_EXPLODE){
 
-        for(unsigned int i = 0; i < p1.size()-particleResolution; i++){
-            p1[i].draw();
-        }
-        for(unsigned int i = 0; i < p2.size()-particleResolution; i++){
-            p2[i].draw();
-        }
-        for(unsigned int i = 0; i < p3.size()-particleResolution; i++){
-            p3[i].draw();
-        }
-        for(unsigned int i = 0; i < p4.size()-particleResolution; i++){
-            p4[i].draw();
-        }
-        for(unsigned int i = 0; i < p5.size()-particleResolution; i++){
-            p5[i].draw();
-        }
-        for(unsigned int i = 0; i < p6.size()-particleResolution; i++){
-            p6[i].draw();
+        if(ofGetFrameNum() < 20  ){
+            versesImg[0].draw(vPosVerse[0]);
+            versesImg[1].draw(vPosVerse[1]);
+            versesImg[2].draw(vPosVerse[2]);
+            versesImg[3].draw(vPosVerse[3]);
+            versesImg[4].draw(vPosVerse[4]);
+            versesImg[5].draw(vPosVerse[5]);
+        }else if(ofGetFrameNum() > 18 ){
+            if(!bInit){
+                initParticles(p1, versesImg[0]);
+                initParticles(p2, versesImg[1]);
+                initParticles(p3, versesImg[2]);
+                initParticles(p4, versesImg[3]);
+                initParticles(p5, versesImg[4]);
+                initParticles(p6, versesImg[5]);
+                bInit = true;
+            }
+            //versesImg[0].draw(0,0);
+
+            for(unsigned int i = 0; i < p1.size()-particleResolution; i++){
+                p1[i].draw();
+            }
+            for(unsigned int i = 0; i < p2.size()-particleResolution; i++){
+                p2[i].draw();
+            }
+            for(unsigned int i = 0; i < p3.size()-particleResolution; i++){
+                p3[i].draw();
+            }
+            for(unsigned int i = 0; i < p4.size()-particleResolution; i++){
+                p4[i].draw();
+            }
+            for(unsigned int i = 0; i < p5.size()-particleResolution; i++){
+                p5[i].draw();
+            }
+            for(unsigned int i = 0; i < p6.size()-particleResolution; i++){
+                p6[i].draw();
+            }
         }
     }
     
@@ -361,6 +427,8 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 void ofApp::exit(){
     ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
     vidRecorder.close();
+    
+    
 }
 
 //--------------------------------------------------------------

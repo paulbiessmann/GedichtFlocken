@@ -25,6 +25,12 @@ void customParticle::setDrawMode(particleDrawMode newDrawMode){
 }
 
 //------------------------------------------------------------------
+void customParticle::setParticleMode(particleMode newParticleMode){
+    pMode = newParticleMode;
+}
+
+
+//------------------------------------------------------------------
 void customParticle::setStartingTime(float _time, int _frameNum){
     startingTimef = _time;
     
@@ -36,33 +42,53 @@ void customParticle::reset(){
     //the unique val allows us to set properties slightly differently for each particle
     uniqueVal = ofRandom(-10000, 10000);
     
-    pos.x = ofRandomWidth();
-    pos.y = ofRandom(0, 200);
-    pos.z = -4000;
     
-    globalPos = ofVec3f(0,0,0);
+    if(pMode == PARTICLE_MODE_EXPLODE){
+        pos.x = ofRandomWidth();
+        pos.y = ofRandom(0, 200);
+        pos.z = -4000;
+        
+        globalPos = ofVec3f(0,0,0);
+        
+        vel.x = ofRandom(-3.9, 3.9);
+        vel.y = ofRandom(-3.9,0);
+        vel.z = -2;
+        
+        frc   = ofPoint(0,0,0);
+        
+        rotation = 0;
+        friction = 0.4;
+        
+        scale = ofRandom(0.5, 1.0);
+        
+        if( 1 ){
+            drag  = ofRandom(0.97, 0.99);
+           // vel.y = fabs(vel.y) * 2.0; //make the particles all be going down
+            vel.z = fabs(vel.z) *3.0;
+        
+        }else{
+            drag  = ofRandom(0.95, 0.998);
+        }
     
-    vel.x = ofRandom(-3.9, 3.9);
-    vel.y = ofRandom(-3.9,0);
-    vel.z = -2;
-    
-    frc   = ofPoint(0,0,0);
-    
-    rotation = ofRandom(-20, 20);
-    friction = 0.4;
-    
-    scale = ofRandom(0.5, 1.0);
-    
-    if( 1 ){
-        drag  = ofRandom(0.97, 0.99);
-       // vel.y = fabs(vel.y) * 2.0; //make the particles all be going down
-        vel.z = fabs(vel.z) *3.0;
-    
-    }else{
-        drag  = ofRandom(0.95, 0.998);
     }
-    
-    
+    else if(pMode == PARTICLE_MODE_SNOW){
+        
+        pos.x = ofRandom(0, fullWidth);
+        pos.y = ofRandom(fullHeight, fullHeight - 500);
+        pos.z = -10;
+        
+        globalPos = ofVec3f(0,0,0);
+        
+        vel.x = 0;
+        vel.y = 0;
+        vel.z = 0;
+        frc   = ofPoint(0,0,0);
+        
+        rotation    = 0;
+        rotFrc      = 0.1;
+        friction    = 0.4;
+        
+    }
     customColor = ofColor(255,255,255);
 }
 
@@ -80,11 +106,18 @@ void customParticle::setPos(ofVec3f thisPos){
 
 }
 
+//------------------------------------------------------------------
 void customParticle::setParticleSize(int thisParticleSize){
     
     particleSize = thisParticleSize;
     
 }
+//------------------------------------------------------------------
+void customParticle::setParticleSize(int thisParticleSizeX, int thisParticleSizeY){
+    particleSizeX = thisParticleSizeX;
+    particleSizeY = thisParticleSizeY;
+}
+
 
 //------------------------------------------------------------------
 void customParticle::setGlobalPos(ofVec3f _xyz){
@@ -103,16 +136,82 @@ void customParticle::update(){
     //we add pos.y as an arg so to prevent obvious vertical banding around x values - try removing the pos.y * 0.006 to see the banding
     float fakeWindX = ofSignedNoise(pos.x * 0.003, pos.y * 0.006, relTimef * 0.6);
 
-    frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
     
-    friction = 0.39;
-    if(relFrameNum > (25 * 10) ){
-        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
-        if(pos.z < -1){
-            frc.x *= 0.2;
-            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.09 + 0.15;
-            frc.y = - frc.y;
+/********** EXPLOSION STROPHEN **********/
+    if(pMode == PARTICLE_MODE_EXPLODE){
+        frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
+        
+        friction = 0.39;
+        if(relFrameNum > (25 * 10) ){
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
+            if(pos.z < -1){
+                frc.x *= 0.2;
+                frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.09 + 0.15;
+                frc.y = - frc.y;
+            }
+
+            if(pos.y < 1000){
+                frc.z = -abs(frc.z) * 4;
+                frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
+                frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.65;
+            }
+            else if(pos.y > 1500){
+                friction = 0.89;
+                frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.05 + 0.5;
+                frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.5;
+            }
+            else{
+                frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
+                frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.02) * 0.09 + 0.01;
+            }
         }
+        else{
+            frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
+            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
+
+        }
+        
+     
+        vel *= drag;
+        vel += frc * 0.4 * (1.0 - friction);
+        
+        //2 - UPDATE OUR POSITION
+        pos += vel;
+        
+        //3 - (optional) LIMIT THE PARTICLES TO STAY ON SCREEN
+        //we could also pass in bounds to check - or alternatively do this at the ofApp level
+        if( pos.x + pos.z > fullWidth ){
+            pos.x = fullWidth + pos.z;
+            vel.x *= -1.0;
+        }else if( pos.x - pos.z < 0 ){
+            pos.x = 0 + pos.z;
+            vel.x *= -1.0;
+        }
+        if( pos.y + pos.z > fullHeight ){
+            pos.y = fullHeight + pos.z;
+            vel.y *= -1.0;
+        }
+        else if( pos.y - pos.z< 0 ){
+            pos.y = 0  + pos.z;
+            vel.y *= -1.0;
+        }
+        if(pos.z > 100){
+            vel.z = -4;
+        }
+    }
+/********** SNOW TEXTURES **********/
+    else if(pMode == PARTICLE_MODE_SNOW){
+        frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
+        friction = 0.39;
+        
+        rotFrc = ofSignedNoise(uniqueVal, pos.x * 0.0004) * 0.08;
+        
+        rotation += rotFrc;
+
+        frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
+        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
+        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.35;
 
         if(pos.y < 1000){
             frc.z = -abs(frc.z) * 4;
@@ -125,19 +224,42 @@ void customParticle::update(){
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.5;
         }
         else{
-            frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
-            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.02) * 0.09 + 0.01;
-        }
-    }
-    else{
         frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
         frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
         frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
-
+        }
+        
+        
+        
+        //vel *= drag;
+        vel += frc * 0.4 * (1.0 - friction);
+        
+        //2 - UPDATE OUR POSITION
+        pos += vel;
+        
+        //3 - (optional) LIMIT THE PARTICLES TO STAY ON SCREEN
+        //we could also pass in bounds to check - or alternatively do this at the ofApp level
+        if( pos.x  > fullWidth ){
+            pos.x = fullWidth ;
+            vel.x *= -1.0;
+        }else if( pos.x < 0 ){
+            pos.x = 0 ;
+            vel.x *= -1.0;
+        }
+        if( pos.y  > fullHeight ){
+            pos.y = fullHeight ;
+            vel.y *= -1.0;
+        }
+        else if( pos.y < 0 ){
+            pos.y = 0  ;
+            vel.y *= -1.0;
+        }
+        if(pos.z > 100){
+            vel.z = -4;
+        }
+        
     }
     
-    vel *= drag;
-    vel += frc * 0.4 * (1.0 - friction);
 
     //we do this so as to skip the bounds check for the bottom and make the particles go back to the top of the screen
 //    if( pos.y + vel.y > fullHeight ){
@@ -147,32 +269,10 @@ void customParticle::update(){
 //        pos.x -= fullWidth;
 //    }
 
-    //2 - UPDATE OUR POSITION
-    pos += vel;
-
-
-    //3 - (optional) LIMIT THE PARTICLES TO STAY ON SCREEN
-    //we could also pass in bounds to check - or alternatively do this at the ofApp level
-    if( pos.x + pos.z > fullWidth ){
-        pos.x = fullWidth + pos.z;
-        vel.x *= -1.0;
-    }else if( pos.x - pos.z < 0 ){
-        pos.x = 0 + pos.z;
-        vel.x *= -1.0;
-    }
-    if( pos.y + pos.z > fullHeight ){
-        pos.y = fullHeight + pos.z;
-        vel.y *= -1.0;
-    }
-    else if( pos.y - pos.z< 0 ){
-        pos.y = 0  + pos.z;
-        vel.y *= -1.0;
-    }
+ 
     
 
-    if(pos.z > 100){
-        vel.z = -4;
-    }
+  
     
 
 }
@@ -191,7 +291,14 @@ void customParticle::draw(){
         ofDrawRectangle(pos.x,pos.y, pos.z, particleSize, particleSize);
     }
     else if(drawMode == PARTICLE_MODE_TEXTURES){
-        particleTexture.draw(pos.x, pos.y, pos.z, particleSize, particleSize);
+//        ofPushMatrix();
+        //ofTranslate(-pos.x, -pos.y,-pos.z);
+        ofRotateZ(rotation);
+       // ofDrawRectangle(pos.x, pos.y, pos.z, particleSize, particleSize);
+       // ofTranslate(pos.x, pos.y,pos.z);
+
+        particleTexture.draw(pos.x, pos.y, pos.z, particleSizeX, particleSizeY);
+//        ofPopMatrix();
     }
 }
 
@@ -227,7 +334,7 @@ void customParticle::addBlinky(float blinkyness){
 }
 
 //------------------------------------------------------------------
-void customParticle::setParticleImg(ofImage thisImage){
+void customParticle::setParticleImg(ofImage &thisImage){
     
 
     

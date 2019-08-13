@@ -18,6 +18,12 @@ enum particleDrawMode{
     PARTICLE_MODE_TEXTURES
 };
 
+enum particleMode{
+    PARTICLE_MODE_EXPLODE,
+    PARTICLE_MODE_SNOW,
+    PARTICLE_MODE_TEX_GLITCH
+};
+
 
 class customParticle{
     
@@ -26,13 +32,16 @@ public:
     customParticle();
     
     void setDrawMode(particleDrawMode newMode);
+    void setParticleMode(particleMode newParticleMode);
 
     void getImage();
     void setColor(ofColor color);
     void setPos(ofVec3f position);
     void setStartingTime(float _time, int _frameNum);
     void setParticleSize(int thisParticleSize);
-    void setParticleImg(ofImage image);
+    void setParticleSize(int thisParticleSizeX, int thisParticleSizeY);
+
+    void setParticleImg(ofImage &image);
     void setGlobalPos(ofVec3f _xyz);
     
     void addBlinky(float blinkyness);
@@ -45,6 +54,7 @@ public:
     ofVec3f pos;
     ofVec3f vel;
     ofVec3f frc;
+    float   rotFrc;
     
     float rotation;
     float friction;
@@ -58,10 +68,14 @@ public:
     ofImage particleTexture;
     ofColor customColor;
     
-    int particleSize = 3;
+    int     particleSize = 3;
+    int     particleSizeX = 10;
+    int     particleSizeY = 10;
     
-    particleDrawMode drawMode = PARTICLE_MODE_POINTS;
-    //particleDrawMode drawMode = PARTICLE_MODE_TEXTURES;
+    //particleDrawMode drawMode = PARTICLE_MODE_POINTS;
+    particleDrawMode drawMode = PARTICLE_MODE_TEXTURES;
+    
+    particleMode        pMode = PARTICLE_MODE_SNOW;
     
 //    int fullWidth = 3840;
 //    int fullHeight = 2160;

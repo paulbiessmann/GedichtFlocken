@@ -172,7 +172,7 @@ void customParticle::update(){
 
         }
         
-     
+        drag  = ofRandom(0.97, 0.99);
         vel *= drag;
         vel += frc * 0.4 * (1.0 - friction);
         
@@ -202,10 +202,11 @@ void customParticle::update(){
     }
 /********** SNOW TEXTURES **********/
     else if(pMode == PARTICLE_MODE_SNOW){
+        fakeWindX = ofSignedNoise(pos.x * 0.03, pos.y * 0.06, relTimef * 0.07);
         frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
         friction = 0.39;
         
-        rotFrc = ofSignedNoise(uniqueVal, pos.x * 0.0004) * 0.08;
+        rotFrc = ofSignedNoise(uniqueVal, relTimef * 0.004) * 0.0008;
         
         rotation += rotFrc;
 
@@ -214,24 +215,24 @@ void customParticle::update(){
         frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.35;
 
         if(pos.y < 1000){
-            frc.z = -abs(frc.z) * 4;
+            frc.z = -abs(frc.z) * 2;
             frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
             frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.65;
         }
         else if(pos.y > 1500){
-            friction = 0.89;
+            friction = 0.69;
             frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.05 + 0.5;
-            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.5;
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.15;
         }
         else{
-        frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
-        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
-        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
+            frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.18;
+            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
         }
         
         
-        
-        //vel *= drag;
+        drag  = ofRandom(0.40, 0.99);
+        vel *= drag;
         vel += frc * 0.4 * (1.0 - friction);
         
         //2 - UPDATE OUR POSITION
@@ -291,14 +292,11 @@ void customParticle::draw(){
         ofDrawRectangle(pos.x,pos.y, pos.z, particleSize, particleSize);
     }
     else if(drawMode == PARTICLE_MODE_TEXTURES){
-//        ofPushMatrix();
-        //ofTranslate(-pos.x, -pos.y,-pos.z);
+  
         ofRotateZ(rotation);
-       // ofDrawRectangle(pos.x, pos.y, pos.z, particleSize, particleSize);
-       // ofTranslate(pos.x, pos.y,pos.z);
-
         particleTexture.draw(pos.x, pos.y, pos.z, particleSizeX, particleSizeY);
-//        ofPopMatrix();
+
+
     }
 }
 

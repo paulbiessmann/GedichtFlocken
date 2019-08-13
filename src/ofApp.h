@@ -21,6 +21,7 @@ class ofApp : public ofBaseApp{
     void resetParticles();
     void initParticles(vector <customParticle>  &pThis, ofImage &imgThis);
     void initFullTexParticles(vector <customParticle> &pThis, vector <ofImage> &imgThis);
+    void initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis);
 
 	
 	void keyPressed(int key);
@@ -68,6 +69,9 @@ class ofApp : public ofBaseApp{
     int     numFullTexParticles;
     vector <ofImage> schnipselImgs;
     vector <ofImage> versesImg;
+    
+    vector <customParticle> pSnowFlakes;
+    ofImage snowFlake;
     
     ofImage kuppelGrid;
     

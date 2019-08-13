@@ -8,6 +8,7 @@ void ofApp::setup(){
     ofSetBackgroundColor(255);
     ofEnableAlphaBlending();
     
+    
     mode = MODE_SNOW;
     
 /************ Video Record *********/
@@ -24,8 +25,8 @@ void ofApp::setup(){
     
     ofAddListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
     
-    recordFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
-    recordFboFlip.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+    recordFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
+    recordFboFlip.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
     bRecording = false;
     
   //  keyReleased('r');
@@ -48,7 +49,7 @@ void ofApp::setup(){
     float imgScaleFac = 5;
     particleResolution = 20;
 
-    
+/**** Explode Particles ****/
     for (int i = 0; i<versesImg.size(); i++){
         int oldWidth   = versesImg[i].getWidth();
         int oldHeight  = versesImg[i].getHeight();
@@ -59,8 +60,6 @@ void ofApp::setup(){
         vPosVerse[i] = ofVec3f((ofGetWidth()/8)*(i+1), ofRandom((ofGetHeight()/2) - 200, (ofGetHeight()/2) + 200), ofRandom(-100,100));
         
     }
-    
-   
     p1.assign(vNum[0], customParticle());
     p2.assign(vNum[1], customParticle());
     p3.assign(vNum[2], customParticle());
@@ -69,8 +68,9 @@ void ofApp::setup(){
     p6.assign(vNum[5], customParticle());
     
     
-    float fullTexScaleFac       = 15;
-    numFullTexParticles         = 200;
+ /**** Schnipsel ****/
+    float fullTexScaleFac       = 15; // -> origSize/scaleFac
+    numFullTexParticles         = 400;
     
     int numSchnipsel            = 30;
     p.assign(numFullTexParticles, customParticle());
@@ -82,20 +82,48 @@ void ofApp::setup(){
         int oldWidth   = schnipselImgs[i].getWidth();
         int oldHeight  = schnipselImgs[i].getHeight();
         schnipselImgs[i].resize(oldWidth/fullTexScaleFac, oldHeight/fullTexScaleFac);
+        schnipselImgs[i].rotate90(ofRandom(90));
+
     }
+    
+/**** Snowflakes ****/
+    int numSnowflakes = 3000;
+    pSnowFlakes.resize(numSnowflakes);
+    snowFlake.load("snow.png");
+    snowFlake.resize(10,10);
     
     resetParticles();
 
+    
+/**** Init Particles *****/
+    
     bInitSchnipsel = false;
     if(!bInitSchnipsel){
         initFullTexParticles(p, schnipselImgs);
         bInitSchnipsel = true;
     }
 
+    initSnowFlakes(pSnowFlakes, snowFlake);
     
 /*  shader glitch  */
    // shaderGlitch.load("glitch1Shader");
     
+}
+//--------------------------------------------------------------
+void ofApp::initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis){
+
+    int numFlakes = pThis.size();
+    int imgWidth = imgThis.getWidth();
+    int imgHeight = imgThis.getHeight();
+    
+    for(unsigned int i=0; i < pThis.size(); i++){
+
+        pThis[i].setParticleImg(imgThis);
+        pThis[i].setParticleSize(imgWidth, imgHeight);
+        pThis[i].setDrawMode(PARTICLE_MODE_TEXTURES);
+        pThis[i].setParticleMode(PARTICLE_MODE_SNOW);
+    }
+
 }
 //--------------------------------------------------------------
 void ofApp::initFullTexParticles(vector <customParticle> &pThis, vector <ofImage> &imgThis){
@@ -197,11 +225,21 @@ void ofApp::resetParticles(){
     }
     
     
+/**** Schnipsel ****/
     for(unsigned int i = 0; i < p.size(); i++){
         p[i].reset();
         p[i].setGlobalPos(ofVec3f(0,0,0));
         p[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
+/**** Snow Flakes ****/
+    for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
+        pSnowFlakes[i].reset();
+        pSnowFlakes[i].setGlobalPos(ofVec3f(0,0,0));
+        pSnowFlakes[i].setDrawMode(PARTICLE_MODE_POINTS);
+    }
+
+    
+    
 }
 
 //--------------------------------------------------------------
@@ -250,6 +288,10 @@ void ofApp::update(){
         for(unsigned int i = 0; i < p.size(); i++){
             p[i].update();
         }
+        for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
+            pSnowFlakes[i].update();
+            pSnowFlakes[i].addBlinky(200);
+        }
     }
     
     recordFbo.getTexture().readToPixels(recordPixels);
@@ -264,15 +306,13 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    ofSetBackgroundColor(ofColor(255,255,255,255));
 
     recordFbo.begin();
-    ofClear(0,0,0,255);
-    ofSetBackgroundColor(ofColor(255,255,255,255));
+    ofClear(255,255,255,255);
 
-    ofSetColor(255);
-    ofDrawRectangle(0,0,fullWidth, fullHeight);
-    kuppelGrid.draw(0,0, fullWidth, fullHeight);
+//    ofSetColor(255);
+//    ofDrawRectangle(0,0,fullWidth, fullHeight);
+//    kuppelGrid.draw(0,0, fullWidth, fullHeight);
     
     
     float t = ofGetElapsedTimef();
@@ -292,6 +332,15 @@ void ofApp::draw(){
         
         for(unsigned int i = 0; i < p.size()-1; i++){
             p[i].draw();
+        }
+        for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){
+            
+           // ofPushMatrix();
+           // ofTranslate(pSnowFlakes[i].pos.x, pSnowFlakes[i].pos.y);
+           // ofRotateZ(ofGetElapsedTimef()*20);  // <- rotate the circle around the z axis by some amount.
+            pSnowFlakes[i].draw();
+          //  ofPopMatrix();
+
         }
     }
     else if(mode == MODE_EXPLODE){

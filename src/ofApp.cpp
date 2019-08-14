@@ -2,7 +2,7 @@
 
 float fps = 25;
 
-float scene1 = 40;
+float scene1 = 400;
 float scene2 = 800;
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -62,8 +62,8 @@ void ofApp::setup(){
     versesImg[4].load("Strophen/5.png");
     versesImg[5].load("Strophen/6.png");
         
-    float imgScaleFac = 5;
-    particleResolution = 8;
+    float imgScaleFac = 4;
+    particleResolution = 10;
 
 /**** Explode Particles ****/
     for (int i = 0; i<versesImg.size(); i++){
@@ -85,10 +85,10 @@ void ofApp::setup(){
     
     
  /**** Schnipsel ****/
-    float fullTexScaleFac       = 10; // -> origSize/scaleFac
-    numFullTexParticles         = 600;
+    float fullTexScaleFac       = 25; // -> origSize/scaleFac
+    numFullTexParticles         = 150;
     
-    int numSchnipsel            = 30;
+    int numSchnipsel            = 30;  // soviel Bilder sind im Ordner
     p.assign(numFullTexParticles, customParticle());
     schnipselImgs.resize(numSchnipsel);
     
@@ -103,12 +103,13 @@ void ofApp::setup(){
     }
     
 /**** Snowflakes ****/
-    int numSnowflakes = 4000;
+    int numSnowflakes = 10;
     pSnowFlakes.resize(numSnowflakes);
     snowFlake.load("snow.png");
     snowFlake.resize(10,10);
     
     resetParticles();
+    resetSchnipsel();
 
     
 /**** Init Particles *****/
@@ -186,7 +187,10 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
                 pThis[pCount].setStartingTime(ofGetElapsedTimef()+2.0, ofGetFrameNum());
                 
                 ofColor pxColor = pixels.getColor(i, j);
-    
+
+//                pThis[pCount].setGlobalPos();
+
+                
                 pThis[pCount].setColor(pxColor);
                 pThis[pCount].setPos(ofVec3f(i, j, ofRandom(-100,100)));
                 pThis[pCount].setParticleSize(particleResolution);
@@ -204,7 +208,8 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
                 ofColor pxColor = pixels.getColor(i, j);
                 ofImage pxImage = imgThis;
                 pxImage.crop(i,j,particleResolution,particleResolution);
-                
+
+                pThis[pCount].setColor(ofColor(150,150,150,200));
                 pThis[pCount].setParticleImg(pxImage);
                 pThis[pCount].setPos(ofVec3f(i, j, ofRandom(-100,100)));
                 pThis[pCount].setParticleSize(particleResolution);
@@ -221,58 +226,65 @@ void ofApp::resetParticles(){
     for(unsigned int i = 0; i < p1.size(); i++){
         p1[i].reset();
         p1[i].setGlobalPos(vPosVerse[0]);
-        p1[i].setDrawMode(PARTICLE_MODE_POINTS);
+        p1[i].setDrawMode(PARTICLE_MODE_TEXTURES);
         p1[i].pMode = PARTICLE_MODE_EXPLODE;
     }
     for(unsigned int i = 0; i < p2.size(); i++){
         p2[i].reset();
         p2[i].setGlobalPos(vPosVerse[1]);
-        p2[i].setDrawMode(PARTICLE_MODE_POINTS);
+        p2[i].setDrawMode(PARTICLE_MODE_TEXTURES);
         p2[i].pMode = PARTICLE_MODE_EXPLODE;
     }
     for(unsigned int i = 0; i < p3.size(); i++){
         p3[i].reset();
         p3[i].setGlobalPos(vPosVerse[2]);
-        p3[i].setDrawMode(PARTICLE_MODE_POINTS);
+        p3[i].setDrawMode(PARTICLE_MODE_TEXTURES);
         p3[i].pMode = PARTICLE_MODE_EXPLODE;
     }
     for(unsigned int i = 0; i < p4.size(); i++){
         p4[i].reset();
         p4[i].setGlobalPos(vPosVerse[3]);
-        p4[i].setDrawMode(PARTICLE_MODE_POINTS);
+        p4[i].setDrawMode(PARTICLE_MODE_TEXTURES);
         p4[i].pMode = PARTICLE_MODE_EXPLODE;
     }
     for(unsigned int i = 0; i < p5.size(); i++){
         p5[i].reset();
         p5[i].setGlobalPos(vPosVerse[4]);
-        p5[i].setDrawMode(PARTICLE_MODE_POINTS);
+        p5[i].setDrawMode(PARTICLE_MODE_TEXTURES);
         p5[i].pMode = PARTICLE_MODE_EXPLODE;
     }
     for(unsigned int i = 0; i < p6.size(); i++){
         p6[i].reset();
         p6[i].setGlobalPos(vPosVerse[5]);
-        p6[i].setDrawMode(PARTICLE_MODE_POINTS);
+        p6[i].setDrawMode(PARTICLE_MODE_TEXTURES);
         p6[i].pMode = PARTICLE_MODE_EXPLODE;
     }
     
     
-/**** Schnipsel ****/
+}
+
+//--------------------------------------------------------------
+void ofApp::resetSchnipsel(){
+    
+    /**** Schnipsel ****/
     for(unsigned int i = 0; i < p.size(); i++){
         p[i].reset();
         p[i].setGlobalPos(ofVec3f(0,0,0));
         p[i].setDrawMode(PARTICLE_MODE_POINTS);
     }
-/**** Snow Flakes ****/
+    /**** Snow Flakes ****/
     for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
         pSnowFlakes[i].reset();
         pSnowFlakes[i].setGlobalPos(ofVec3f(0,0,0));
         pSnowFlakes[i].setDrawMode(PARTICLE_MODE_POINTS);
         pSnowFlakes[i].setColor(ofColor(ofRandom(100,250)));
     }
-
+    
     
     
 }
+
+
 
 //--------------------------------------------------------------
 void ofApp::update(){
@@ -292,34 +304,33 @@ void ofApp::update(){
   if(bUpdateExplode || 1){
         for(unsigned int i = 0; i < p1.size(); i++){
             p1[i].update();
-            p1[i].addBlinky(200);
+            p1[i].addBlinky(150);
         }
         for(unsigned int i = 0; i < p2.size(); i++){
             p2[i].update();
-            p2[i].addBlinky(200);
+            p2[i].addBlinky(150);
         }
         for(unsigned int i = 0; i < p3.size(); i++){
             p3[i].update();
-            p3[i].addBlinky(200);
+            p3[i].addBlinky(150);
         }
         for(unsigned int i = 0; i < p4.size(); i++){
             p4[i].update();
-            p4[i].addBlinky(200);
+            p4[i].addBlinky(150);
         }
         for(unsigned int i = 0; i < p5.size(); i++){
             p5[i].update();
-            p5[i].addBlinky(200);
+            p5[i].addBlinky(150);
         }
         for(unsigned int i = 0; i < p6.size(); i++){
             p6[i].update();
-            p6[i].addBlinky(200);
+            p6[i].addBlinky(150);
         }
     }
     if(bUpdateSnow || 1){
         int pSize ;
         pSize = ofGetFrameNum() / 1;
         if(pSize >= p.size()) {pSize = p.size();}
-        
         for(unsigned int i = 0; i < pSize; i++){
             p[i].update();
         }
@@ -351,7 +362,7 @@ void ofApp::draw(){
     
     // copy enable part of gl state
    // glPushAttrib(GL_ENABLE_BIT);
-
+    ofEnableAlphaBlending();
    // ofEnableDepthTest();
 //    // setup gl state
     
@@ -390,29 +401,58 @@ void ofApp::draw(){
 //    if(mode == MODE_EXPLODE ){
        
 
-        if(ofGetFrameNum() < scene1 ){
+        if(ofGetFrameNum() <= scene1 ){
             for(int i=0;i< versesImg.size();i++){
-                vPosVerse[i] += ofSignedNoise(ofGetElapsedTimef() * 0.01, ofGetElapsedTimef() * 0.01);
+                vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
+                
+                
+                vPosVerse[i].x += ofGetElapsedTimef() * 0.01 + sin(ofGetElapsedTimef() * 0.001 * i ) * 3;
+                vPosVerse[i].y += cos(ofGetElapsedTimef() * 0.006 * i ) * 0.02;
+
+                
+                if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
+                    vPosVerse[i].x = -versesImg[i].getWidth();
+                }
+                
+                
                 ofSetColor(255);
-                versesImg[i].draw(vPosVerse[i]);
+                glPushMatrix();
+                    ofTranslate(-vPosVerse[i].x, -vPosVerse[i].y);
+                    ofRotateZ(sin(ofGetElapsedTimef() * 0.001)*0.5);
+                    ofRotateX(sin(ofGetElapsedTimef() * 0.002)*0.3);
+                    versesImg[i].draw(vPosVerse[i].x *2 , vPosVerse[i].y *2);
+                glPopMatrix();
             }
            
             /*** schnipsel ***/
+
             for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
             for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
-            
-           
-            
-            
-            
+
         
         }
         
 
-        if(ofGetFrameNum() >= scene1){
+        if(ofGetFrameNum() > scene1){
+            
+            /*** schnipsel ***/
+            
+           
+            for(unsigned int i = 0; i < p.size()-1; i++){
+//                ofPushMatrix();
+//                ofTranslate(-p[i].pos.x, -p[i].pos.y);
+//             //   ofRotateZ(ofGetElapsedTimef()* 0.1 * (i+1));
+//                ofRotateX(sin(ofGetElapsedTimef() * 0.02 * i)*20);
+                p[i].draw();
+//                ofPopMatrix();
+
+                
+
+            }
+            //  for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
             
             if(!bInit){
-                //resetParticles();
+                resetParticles();
                 initParticles(p1, versesImg[0]);
                 initParticles(p2, versesImg[1]);
                 initParticles(p3, versesImg[2]);
@@ -429,9 +469,7 @@ void ofApp::draw(){
             for(unsigned int i = 0; i < p6.size()-particleResolution; i++){ p6[i].draw(); }
 
             
-/*** schnipsel ***/
-            for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
-            for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
+         
     
             
         }

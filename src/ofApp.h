@@ -18,6 +18,7 @@ class ofApp : public ofBaseApp{
 	void draw();
     void exit();
     
+    void resetSchnipsel();
     void resetParticles();
     void initParticles(vector <customParticle>  &pThis, ofImage &imgThis);
     void initFullTexParticles(vector <customParticle> &pThis, vector <ofImage> &imgThis);

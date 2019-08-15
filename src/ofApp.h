@@ -105,4 +105,6 @@ class ofApp : public ofBaseApp{
     bool    bUpdateExplode;
     bool    bUpdateSnow;
     
+    bool    bEnd;
+    
 };

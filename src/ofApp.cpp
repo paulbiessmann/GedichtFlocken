@@ -2,8 +2,22 @@
 
 float fps = 25;
 
-float scene1 = 400;
-float scene2 = 800;
+/*** Wird rückwärts abgespielt, szenen von 4 -> 1 am Ende ***/
+/*     immer < scene. 0 < Szene 1 < scene1; scene1 < Szene 2 < scene2; usw     */
+//
+//float scene0 = 0;    // explosion reverse - Flocken werden zu Gedichten
+//float scene1 = 2600; // so lange steht das Gedicht da
+//float scene2 = 4800; // Tex Vec Effekt
+//float scene3 = 6600; // zusätzlich einzelne Textflocken
+//float scene4 = 8400;
+
+// Reverse gerechnet:
+float scene0 = 0;    // Black
+float scene1 = 1800; // zusätzlich einzelne Textflocken
+float scene2 = 3600; // Tex Vec Effekt
+float scene3 = 5800; // so lange steht das Gedicht da
+float scene4 = 8400; // explosion reverse - Flocken werden zu Gedichten
+
 //--------------------------------------------------------------
 void ofApp::setup(){
     
@@ -46,6 +60,7 @@ void ofApp::setup(){
     bRecording = false;
     
     keyReleased('r');
+    bEnd = false;
 
 /** end recording **/
     
@@ -63,7 +78,7 @@ void ofApp::setup(){
     versesImg[5].load("Strophen/6.png");
         
     float imgScaleFac = 4;
-    particleResolution = 10;
+    particleResolution = 7;
 
 /**** Explode Particles ****/
     for (int i = 0; i<versesImg.size(); i++){
@@ -86,7 +101,7 @@ void ofApp::setup(){
     
  /**** Schnipsel ****/
     float fullTexScaleFac       = 25; // -> origSize/scaleFac
-    numFullTexParticles         = 150;
+    numFullTexParticles         = 350;
     
     int numSchnipsel            = 30;  // soviel Bilder sind im Ordner
     p.assign(numFullTexParticles, customParticle());
@@ -98,7 +113,6 @@ void ofApp::setup(){
         int oldWidth   = schnipselImgs[i].getWidth();
         int oldHeight  = schnipselImgs[i].getHeight();
         schnipselImgs[i].resize(oldWidth/fullTexScaleFac, oldHeight/fullTexScaleFac);
-        schnipselImgs[i].rotate90(ofRandom(90));
 
     }
     
@@ -162,6 +176,9 @@ void ofApp::initFullTexParticles(vector <customParticle> &pThis, vector <ofImage
             int randNum = ofRandom(numImages);
             int imgWidth = imgThis[randNum].getWidth();
             int imgHeight = imgThis[randNum].getHeight();
+            
+            imgThis[randNum].rotate90(ofRandom(360));
+            
             pThis[i].setParticleImg(imgThis[randNum]);
             pThis[i].setParticleSize(imgWidth, imgHeight);
             pThis[i].setDrawMode(PARTICLE_MODE_TEXTURES);
@@ -184,7 +201,7 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
         for(unsigned int i = 0; i < textWidth - particleResolution; i += particleResolution){
             for(unsigned int j = 0; j < textHeight - particleResolution; j += particleResolution){
     
-                pThis[pCount].setStartingTime(ofGetElapsedTimef()+2.0, ofGetFrameNum());
+                pThis[pCount].setStartingTime(ofGetElapsedTimef(), ofGetFrameNum());
                 
                 ofColor pxColor = pixels.getColor(i, j);
 
@@ -209,9 +226,9 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
                 ofImage pxImage = imgThis;
                 pxImage.crop(i,j,particleResolution,particleResolution);
 
-                pThis[pCount].setColor(ofColor(150,150,150,200));
+                //pThis[pCount].setColor(ofColor(220,220,220,200));
                 pThis[pCount].setParticleImg(pxImage);
-                pThis[pCount].setPos(ofVec3f(i, j, ofRandom(-100,100)));
+                pThis[pCount].setPos(ofVec3f(i, j, 0));//ofRandom(-100,100)));
                 pThis[pCount].setParticleSize(particleResolution);
                 pCount++;
             }
@@ -433,7 +450,7 @@ void ofApp::draw(){
         }
         
 
-        if(ofGetFrameNum() > scene1){
+        if(ofGetFrameNum() > scene3 && ofGetFrameNum() <= scene4){
             
             /*** schnipsel ***/
             
@@ -467,12 +484,13 @@ void ofApp::draw(){
             for(unsigned int i = 0; i < p4.size()-particleResolution; i++){ p4[i].draw(); }
             for(unsigned int i = 0; i < p5.size()-particleResolution; i++){ p5[i].draw(); }
             for(unsigned int i = 0; i < p6.size()-particleResolution; i++){ p6[i].draw(); }
-
-            
-         
-    
-            
         }
+        
+        else if(ofGetFrameNum() > scene4 && !bEnd){
+            keyReleased('r');
+            bEnd = true;
+        }
+
     }
     
     

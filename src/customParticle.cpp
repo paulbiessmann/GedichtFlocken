@@ -142,7 +142,17 @@ void customParticle::update(){
         frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
         
         friction = 0.29;
-        if(relFrameNum > (25 * 10) ){
+        
+        if(relFrameNum < (50)){
+            friction = 0.9;
+            //frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
+            frc.z = 0;
+            frc.x = 0;
+            frc.y = 0;
+            
+
+        }
+        else if(relFrameNum > (25 * 10) ){
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
             frc.x = fakeWindX * 3.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
 
@@ -155,7 +165,7 @@ void customParticle::update(){
             if(pos.y < 700){
                 frc.z = -abs(frc.z) * 4;
                 frc.x = fakeWindX * 3.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
-                frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 1.65;
+                frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 2.65;
             }
             else if(pos.y > 1500){
                 friction = 0.49;
@@ -167,6 +177,7 @@ void customParticle::update(){
             else{
                 frc.x = fakeWindX * 4.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 4.8;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.02) * 0.09 + 0.01;
+                frc.y = ofSignedNoise(uniqueVal, pos.y * 0.006, relTimef*0.2) * 0.7 - 0.95;
 
             }
         }
@@ -186,12 +197,15 @@ void customParticle::update(){
         
         //3 - (optional) LIMIT THE PARTICLES TO STAY ON SCREEN
         //we could also pass in bounds to check - or alternatively do this at the ofApp level
-        if( pos.x + pos.z > fullWidth ){
-            pos.x = fullWidth + pos.z;
-            vel.x *= -1.0;
-        }else if( pos.x - pos.z < 0 ){
-            pos.x = 0 + pos.z;
-            vel.x *= -1.0;
+//        if( pos.x + pos.z > fullWidth ){
+//            pos.x = fullWidth + pos.z;
+//            vel.x *= -1.0;
+//        }else if( pos.x - pos.z < 0 ){
+//            pos.x = 0 + pos.z;
+//            vel.x *= -1.0;
+//        }
+        if( pos.x + vel.x > fullWidth  ){
+            pos.x -= fullWidth;
         }
         if( pos.y + pos.z > fullHeight ){
             pos.y = fullHeight + pos.z;
@@ -233,7 +247,7 @@ void customParticle::update(){
                 frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.65;
             }
             else if(pos.y > 1500){
-                friction = 0.39;
+                friction = abs(sin(relTimef *0.001)) * 0.39 + 0.39 ;
                 frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.05 + 0.5;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.15;
             }
@@ -254,12 +268,15 @@ void customParticle::update(){
         
         //3 - (optional) LIMIT THE PARTICLES TO STAY ON SCREEN
         //we could also pass in bounds to check - or alternatively do this at the ofApp level
-        if( pos.x  > fullWidth ){
-            pos.x = fullWidth ;
-            vel.x *= -1.0;
-        }else if( pos.x < 0 ){
-            pos.x = 0 ;
-            vel.x *= -1.0;
+//        if( pos.x  > fullWidth ){
+//            pos.x = fullWidth ;
+//            vel.x *= -1.0;
+//        }else if( pos.x < 0 ){
+//            pos.x = 0 ;
+//            vel.x *= -1.0;
+//        }
+        if( pos.x + vel.x > fullWidth  ){
+            pos.x -= fullWidth;
         }
         if( pos.y  > fullHeight ){
             pos.y = fullHeight ;
@@ -272,7 +289,7 @@ void customParticle::update(){
         if(pos.z > 100){
             vel.z = -4;
         }
-        
+     
     }
     
 

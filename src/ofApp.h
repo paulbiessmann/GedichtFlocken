@@ -23,7 +23,8 @@ class ofApp : public ofBaseApp{
     void initParticles(vector <customParticle>  &pThis, ofImage &imgThis);
     void initFullTexParticles(vector <customParticle> &pThis, vector <ofImage> &imgThis);
     void initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis);
-
+    void initTexVecs();
+    
 	
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -106,5 +107,34 @@ class ofApp : public ofBaseApp{
     bool    bUpdateSnow;
     
     bool    bEnd;
+    
+    
+    
+/* Tex Vec */
+    ofTexture tex;
+    
+    vector <ofTexture> texVecs;
+    vector <ofColor> colTexVecs;
+    
+    vector <int> texVecsPosX;
+    vector <int> texVecsPosY;
+    vector <int> texVecsPosZ;
+    
+    int texVecSize;
+    int texVecNum;
+    
+    bool bTexVec = false;
+    
+    int growing = 0;
+    
+    ofVec2f center;
+    ofFbo   texVecGetter;
+    float dirX = 0;
+    float dirY = 0;
+    
+    vector <ofVec3f> texVecPosDraw;
+    
+    int recordedFrame;
+    
     
 };

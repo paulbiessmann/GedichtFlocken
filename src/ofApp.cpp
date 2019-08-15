@@ -25,7 +25,7 @@ void ofApp::setup(){
     ofEnableAlphaBlending();
     mode = MODE_EXPLODE;
     
-    
+    recordedFrame = 0;
     
 /**** Setup post-processing chain ****/
     post.init(ofGetWidth(), ofGetHeight());
@@ -57,6 +57,7 @@ void ofApp::setup(){
     
     recordFbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
     recordFboFlip.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+    
     bRecording = false;
     
     keyReleased('r');
@@ -88,7 +89,7 @@ void ofApp::setup(){
         versesImg[i].resize(oldWidth / imgScaleFac, oldHeight / imgScaleFac);
         vNum[i] = (versesImg[i].getWidth() / particleResolution) * (versesImg[i].getHeight()/particleResolution);
         
-        vPosVerse[i] = ofVec3f((ofGetWidth()/8)*(i+1), ofRandom((ofGetHeight()/2) - 200, (ofGetHeight()/2) + 200), 0);
+        vPosVerse[i] = ofVec3f((ofGetWidth()/8)*(i+1), ofRandom((ofGetHeight()/2) - 300, (ofGetHeight()/2) + 10), 0);
         
     }
     p1.assign(vNum[0], customParticle());
@@ -101,7 +102,7 @@ void ofApp::setup(){
     
  /**** Schnipsel ****/
     float fullTexScaleFac       = 25; // -> origSize/scaleFac
-    numFullTexParticles         = 350;
+    numFullTexParticles         = 200; // so viele Partikel davon
     
     int numSchnipsel            = 30;  // soviel Bilder sind im Ordner
     p.assign(numFullTexParticles, customParticle());
@@ -117,7 +118,7 @@ void ofApp::setup(){
     }
     
 /**** Snowflakes ****/
-    int numSnowflakes = 10;
+    int numSnowflakes = 100;
     pSnowFlakes.resize(numSnowflakes);
     snowFlake.load("snow.png");
     snowFlake.resize(10,10);
@@ -136,17 +137,54 @@ void ofApp::setup(){
         initParticles(p5, versesImg[4]);
         initParticles(p6, versesImg[5]);
 
-    
     bInitSchnipsel = false;
     if(!bInitSchnipsel){
         initFullTexParticles(p, schnipselImgs);
         bInitSchnipsel = true;
     }
-
     initSnowFlakes(pSnowFlakes, snowFlake);
     
-/*  shader glitch  */
-   // shaderGlitch.load("glitch1Shader");
+
+/** Tex Vec **/
+    texVecGetter.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
+    texVecNum = 1500;
+    initTexVecs();
+    
+    
+}
+//--------------------------------------------------------------
+void ofApp::initTexVecs(){
+    center = ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
+    
+    growing = 5;
+    
+    //texVecNum = 200;
+    texVecSize = 50;
+    //texVecs.resize(texVecNum);
+    
+    colTexVecs.resize(texVecNum);
+    
+    texVecsPosX.resize(texVecNum);
+    texVecsPosY.resize(texVecNum);
+    texVecsPosZ.resize(texVecNum);
+    
+    texVecPosDraw.resize(texVecNum);
+    
+    
+    
+    
+    
+    for(int i = 0; i < texVecNum; i++) {
+        //texVecs[i].allocate(texVecSize,texVecSize, GL_RGB);
+        texVecsPosX[i]   = ofRandom((int) fullWidth/4, 3*fullWidth/4 );
+        texVecsPosY[i]   = ofRandom((int) (fullHeight/2) - 200, (fullHeight/2) +200);
+        texVecsPosZ[i]   = ofRandom((int) - 500, 500);
+        colTexVecs[i]    = ofColor(ofRandom(220, 225), ofRandom(220,225), ofRandom(220,225), ofRandom(200));
+        
+        texVecPosDraw[i].x = ofRandom(0, fullWidth) ;
+        texVecPosDraw[i].y = ofRandom(0, fullHeight) ;
+        texVecPosDraw[i].z = ofRandom( - 500, 500);
+    }
     
 }
 //--------------------------------------------------------------
@@ -201,7 +239,7 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
         for(unsigned int i = 0; i < textWidth - particleResolution; i += particleResolution){
             for(unsigned int j = 0; j < textHeight - particleResolution; j += particleResolution){
     
-                pThis[pCount].setStartingTime(ofGetElapsedTimef(), ofGetFrameNum());
+                pThis[pCount].setStartingTime(ofGetElapsedTimef(), recordedFrame);
                 
                 ofColor pxColor = pixels.getColor(i, j);
 
@@ -220,7 +258,7 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
         for(unsigned int i = 0; i <= textWidth-particleResolution ; i += particleResolution){
             for(unsigned int j = 0; j <= textHeight-particleResolution; j += particleResolution){
                 
-                pThis[pCount].setStartingTime(ofGetElapsedTimef() + 2.0, ofGetFrameNum());
+                pThis[pCount].setStartingTime(ofGetElapsedTimef() + 2.0, recordedFrame);
 
                 ofColor pxColor = pixels.getColor(i, j);
                 ofImage pxImage = imgThis;
@@ -318,7 +356,7 @@ void ofApp::update(){
     
     
 //    if(mode == MODE_EXPLODE){
-  if(bUpdateExplode || 1){
+  if(recordedFrame > scene3){
         for(unsigned int i = 0; i < p1.size(); i++){
             p1[i].update();
             p1[i].addBlinky(150);
@@ -344,7 +382,7 @@ void ofApp::update(){
             p6[i].addBlinky(150);
         }
     }
-    if(bUpdateSnow || 1){
+    if(recordedFrame > scene2){
         int pSize ;
         pSize = ofGetFrameNum() / 1;
         if(pSize >= p.size()) {pSize = p.size();}
@@ -366,6 +404,7 @@ void ofApp::update(){
     recordFbo.getTexture().readToPixels(recordPixels);
     if(bRecording){
         bool success = vidRecorder.addFrame(recordPixels);
+       
         if (!success) {
             ofLogWarning("This frame was not added!");
         }
@@ -376,6 +415,8 @@ void ofApp::update(){
 void ofApp::draw(){
 
 
+    
+    recordedFrame = vidRecorder.getNumVideoFramesRecorded();
     
     // copy enable part of gl state
    // glPushAttrib(GL_ENABLE_BIT);
@@ -411,22 +452,187 @@ void ofApp::draw(){
         cout << "sec " << ofGetElapsedTimef() << "\n";
     }
     
-    if(1){
-        
-       
-//    }
-//    if(mode == MODE_EXPLODE ){
+    
        
 
-        if(ofGetFrameNum() <= scene1 ){
+   
+        
+/** Scene 1  -  Voll mit Tex Vex, einzelne Flocken schneien runter (weiß auf Schwarz, als Fonts)**/
+        if(recordedFrame > scene0 && recordedFrame <= scene1 ){
+            
+            texVecGetter.begin();
+            ofClear(255,255,255,255);
+
+            /*** schnipsel ***/
+            for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
+            for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
+            
+            /** Strophen global move **/
+            for(int i=0;i< versesImg.size();i++){
+                vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
+
+                vPosVerse[i].x += ofGetElapsedTimef() * 0.01 + sin(ofGetElapsedTimef() * 0.001 * i ) * 3;
+                vPosVerse[i].y += cos(ofGetElapsedTimef() * 0.006 * i ) * 0.02;
+
+                if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
+                    vPosVerse[i].x = -versesImg[i].getWidth();
+                }
+
+
+                ofSetColor(255);
+                glPushMatrix();
+                ofTranslate(-vPosVerse[i].x, -vPosVerse[i].y);
+                ofRotateZ(sin(ofGetElapsedTimef() * 0.001)*0.5);
+                ofRotateX(sin(ofGetElapsedTimef() * 0.002)*0.3);
+                versesImg[i].draw(vPosVerse[i].x *2 , vPosVerse[i].y *2);
+                glPopMatrix();
+            }
+            texVecGetter.end();
+            texVecGetter.draw(0,0);
+            
+            /** Tex Vecs **/
+            growing++;
+            int texVecNumNew = ofMap(recordedFrame, scene0, scene2, texVecNum, 0 );
+            
+            for (int i=0; i < texVecNumNew; i++){
+               // dirX =  (texVecsPosX[i] - center.x) * growing * 0.0001;
+               // dirY =  (texVecsPosY[i] - center.y) * growing * 0.0001;
+                float fakeWindX = ofSignedNoise(texVecPosDraw[i].x * 0.03, texVecPosDraw[i].y * 0.06, ofGetElapsedTimef() * 0.6);
+                dirX = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.06, ofGetElapsedTimef()*0.2) * 0.59 + 0.58;
+                dirY = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.02, ofGetElapsedTimef()*0.2) * 0.59 - 0.78;
+                
+                
+                if (texVecPosDraw[i].x + dirX > fullWidth ){
+                    dirX = -dirX;
+                    texVecPosDraw[i].x = 0;
+                }
+                if (texVecPosDraw[i].x + dirX < 0 ){
+                    dirX = -dirX;
+                    texVecPosDraw[i].x = fullWidth;
+                }
+                
+                if (texVecPosDraw[i].y + dirY > fullHeight){
+                    dirY = -dirY;
+                    texVecPosDraw[i].y= 0;
+                }
+                if (texVecPosDraw[i].y + dirY < 0){
+                    dirY = -dirY;
+                    texVecPosDraw[i].y = fullHeight;
+                }
+                if (texVecPosDraw[i].z < - 1000){
+                    texVecPosDraw[i].z = 1000;
+                }
+                
+                float drag = ofRandom(0.8, 0.99);
+                dirX *= drag;
+                dirY *= drag;
+                texVecPosDraw[i].x += dirX + fakeWindX;
+                texVecPosDraw[i].y += dirY + fakeWindX;
+                texVecPosDraw[i].z -= growing * 0.0001;
+                
+                ofSetColor(colTexVecs[i]);
+               
+                texVecGetter.getTexture().drawSubsection(texVecPosDraw[i].x, texVecPosDraw[i].y, texVecPosDraw[i].z, texVecSize, texVecSize, texVecsPosX[i], texVecsPosY[i], texVecSize, texVecSize);
+                
+                ofSetColor(255);
+                
+            }
+            
+        }
+/** Scene 2   -  Tex Vex Effect, von dicht/dunkel nach wenig dicht/hell**/
+        if(recordedFrame > scene1 && recordedFrame <= scene2 ){
+            texVecGetter.begin();
+            ofClear(255,255,255,255);
+            
+            /*** schnipsel ***/
+            for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
+            for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
+            
+            
+            /** Strophen global move **/
             for(int i=0;i< versesImg.size();i++){
                 vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
                 
+                vPosVerse[i].x += ofGetElapsedTimef() * 0.01 + sin(ofGetElapsedTimef() * 0.001 * i ) * 3;
+                vPosVerse[i].y += cos(ofGetElapsedTimef() * 0.006 * i ) * 0.02;
+                
+                if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
+                    vPosVerse[i].x = -versesImg[i].getWidth();
+                }
+                
+                
+                ofSetColor(255);
+                glPushMatrix();
+                ofTranslate(-vPosVerse[i].x, -vPosVerse[i].y);
+                ofRotateZ(sin(ofGetElapsedTimef() * 0.001)*0.5);
+                ofRotateX(sin(ofGetElapsedTimef() * 0.002)*0.3);
+                versesImg[i].draw(vPosVerse[i].x *2 , vPosVerse[i].y *2);
+                glPopMatrix();
+            }
+            texVecGetter.end();
+            texVecGetter.draw(0,0);
+            
+            /** Tex Vecs **/
+            growing++;
+            int texVecNumNew = ofMap(recordedFrame, scene0, scene2, texVecNum, 0 );
+            
+            for (int i=0; i < texVecNumNew; i++){
+                // dirX =  (texVecsPosX[i] - center.x) * growing * 0.0001;
+                // dirY =  (texVecsPosY[i] - center.y) * growing * 0.0001;
+                float fakeWindX = ofSignedNoise(texVecPosDraw[i].x * 0.03, texVecPosDraw[i].y * 0.06, ofGetElapsedTimef() * 0.6);
+                dirX = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.06, ofGetElapsedTimef()*0.2) * 0.59 + 0.58;
+                dirY = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.02, ofGetElapsedTimef()*0.2) * 0.59 - 0.78;
+                
+                
+                if (texVecPosDraw[i].x + dirX > fullWidth ){
+                    dirX = -dirX;
+                    texVecPosDraw[i].x = 0;
+                }
+                if (texVecPosDraw[i].x + dirX < 0 ){
+                    dirX = -dirX;
+                    texVecPosDraw[i].x = fullWidth;
+                }
+                
+                if (texVecPosDraw[i].y + dirY > fullHeight){
+                    dirY = -dirY;
+                    texVecPosDraw[i].y= 0;
+                }
+                if (texVecPosDraw[i].y + dirY < 0){
+                    dirY = -dirY;
+                    texVecPosDraw[i].y = fullHeight;
+                }
+                if (texVecPosDraw[i].z < - 1000){
+                    texVecPosDraw[i].z = 1000;
+                }
+
+                float drag = ofRandom(0.8, 0.99);
+                dirX *= drag;
+                dirY *= drag;
+                
+                texVecPosDraw[i].x += dirX + fakeWindX;
+                texVecPosDraw[i].y += dirY + fakeWindX;
+                texVecPosDraw[i].z -= growing * 0.0001;
+                
+                ofSetColor(colTexVecs[i]);
+                
+                texVecGetter.getTexture().drawSubsection(texVecPosDraw[i].x, texVecPosDraw[i].y, texVecPosDraw[i].z, texVecSize, texVecSize, texVecsPosX[i], texVecsPosY[i], texVecSize, texVecSize);
+                
+                ofSetColor(255);
+                
+            }
+            
+          
+        }
+        
+/** Scene 3   -  Strophen bewegen sich, leichte Vis Effects**/
+        if(recordedFrame > scene2 && recordedFrame <= scene3 ){
+            /** Strophen global move **/
+            for(int i=0;i< versesImg.size();i++){
+                vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
                 
                 vPosVerse[i].x += ofGetElapsedTimef() * 0.01 + sin(ofGetElapsedTimef() * 0.001 * i ) * 3;
                 vPosVerse[i].y += cos(ofGetElapsedTimef() * 0.006 * i ) * 0.02;
 
-                
                 if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
                     vPosVerse[i].x = -versesImg[i].getWidth();
                 }
@@ -442,7 +648,6 @@ void ofApp::draw(){
             }
            
             /*** schnipsel ***/
-
             for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
             for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
 
@@ -450,21 +655,12 @@ void ofApp::draw(){
         }
         
 
-        if(ofGetFrameNum() > scene3 && ofGetFrameNum() <= scene4){
+/** Scene 4   -  Strophen Explodieren, fliegen weg als Schnee   **/
+        if(recordedFrame > scene3 && recordedFrame <= scene4){
             
             /*** schnipsel ***/
-            
-           
             for(unsigned int i = 0; i < p.size()-1; i++){
-//                ofPushMatrix();
-//                ofTranslate(-p[i].pos.x, -p[i].pos.y);
-//             //   ofRotateZ(ofGetElapsedTimef()* 0.1 * (i+1));
-//                ofRotateX(sin(ofGetElapsedTimef() * 0.02 * i)*20);
                 p[i].draw();
-//                ofPopMatrix();
-
-                
-
             }
             //  for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
             
@@ -485,13 +681,14 @@ void ofApp::draw(){
             for(unsigned int i = 0; i < p5.size()-particleResolution; i++){ p5[i].draw(); }
             for(unsigned int i = 0; i < p6.size()-particleResolution; i++){ p6[i].draw(); }
         }
-        
-        else if(ofGetFrameNum() > scene4 && !bEnd){
+    
+/** END Recording **/
+        if(recordedFrame > scene4 && !bEnd){
             keyReleased('r');
             bEnd = true;
         }
 
-    }
+    
     
     
     // end scene and draw
@@ -521,17 +718,6 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
 
-//    if(key == 'n'){
-//        boxPositions.push_back(ofVec3f(ofRandom(-300, 300),
-//                                       ofRandom(0, 300),
-//                                       ofRandom(-800, -500)));
-//        boxSizes.push_back(ofRandom(30, 100));
-//        boxColors.push_back(ofColor(255));
-//
-//        num++;
-//        p.assign(num, customParticle());
-//
-//    }
     
     if(key=='r'){
         bRecording = !bRecording;

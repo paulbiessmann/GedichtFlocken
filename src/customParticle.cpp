@@ -74,7 +74,7 @@ void customParticle::reset(){
     else if(pMode == PARTICLE_MODE_SNOW){
         
         pos.x = ofRandom(0, fullWidth);
-        pos.y = ofRandom(fullHeight, fullHeight - 500 - ofRandom(100));
+        pos.y = ofRandom(fullHeight, fullHeight - 300 - ofRandom(100));
         pos.z = -10;
         
         globalPos = ofVec3f(0,0,0);
@@ -152,7 +152,7 @@ void customParticle::update(){
             
 
         }
-        else if(relFrameNum > (25 * 10) ){
+        else if(relFrameNum > (10) ){
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
             frc.x = fakeWindX * 3.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
 

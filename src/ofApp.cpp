@@ -18,6 +18,9 @@ float scene2 = 3600; // Tex Vec Effekt
 float scene3 = 5800; // so lange steht das Gedicht da
 float scene4 = 8400; // explosion reverse - Flocken werden zu Gedichten
 
+
+float vidPart         = 500; //frames in one vid
+float writeWaitTime   = 200; //seconds waiting between recordings to reduce memory
 //--------------------------------------------------------------
 void ofApp::setup(){
     
@@ -171,15 +174,12 @@ void ofApp::initTexVecs(){
     texVecPosDraw.resize(texVecNum);
     
     
-    
-    
-    
     for(int i = 0; i < texVecNum; i++) {
         //texVecs[i].allocate(texVecSize,texVecSize, GL_RGB);
         texVecsPosX[i]   = ofRandom((int) fullWidth/4, 3*fullWidth/4 );
         texVecsPosY[i]   = ofRandom((int) (fullHeight/2) - 200, (fullHeight/2) +200);
-        texVecsPosZ[i]   = ofRandom((int) - 500, 500);
-        colTexVecs[i]    = ofColor(ofRandom(220, 225), ofRandom(220,225), ofRandom(220,225), ofRandom(200));
+        texVecsPosZ[i]   = ofRandom((int) -1000, 1000);
+        colTexVecs[i]    = ofColor(ofRandom(150, 155), ofRandom(150,155), ofRandom(150,155), ofRandom(200));
         
         texVecPosDraw[i].x = ofRandom(0, fullWidth) ;
         texVecPosDraw[i].y = ofRandom(0, fullHeight) ;
@@ -344,6 +344,10 @@ void ofApp::resetSchnipsel(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
+    if(!bPause){
+        recordedFrame = vidRecorder.getNumVideoFramesRecorded() - vidRecorder.getVideoQueueSize();
+    }
+
     std::stringstream strm;
     strm << "fps: " << ofGetFrameRate();
     ofSetWindowTitle(strm.str());
@@ -356,7 +360,7 @@ void ofApp::update(){
     
     
 //    if(mode == MODE_EXPLODE){
-  if(recordedFrame > scene3){
+  if(recordedFrame > scene3 && !bPause){
         for(unsigned int i = 0; i < p1.size(); i++){
             p1[i].update();
             p1[i].addBlinky(150);
@@ -382,16 +386,16 @@ void ofApp::update(){
             p6[i].addBlinky(150);
         }
     }
-    if(recordedFrame > scene2){
+    if(recordedFrame > scene2 && !bPause){
         int pSize ;
-        pSize = ofGetFrameNum() / 1;
+        pSize = recordedFrame / 1;
         if(pSize >= p.size()) {pSize = p.size();}
         for(unsigned int i = 0; i < pSize; i++){
             p[i].update();
         }
         
         int pSnowSize ;
-        pSnowSize = ofGetFrameNum()*2;
+        pSnowSize = recordedFrame*2;
         if(pSnowSize >= pSnowFlakes.size()) {pSnowSize = pSnowFlakes.size();}
         for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
             pSnowFlakes[i].addBlinky(200);
@@ -414,10 +418,10 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
+    if(0){
+        cout << "recFrame " << recordedFrame << "\n";
+    }
 
-    
-    recordedFrame = vidRecorder.getNumVideoFramesRecorded();
-    
     // copy enable part of gl state
    // glPushAttrib(GL_ENABLE_BIT);
     ofEnableAlphaBlending();
@@ -458,7 +462,7 @@ void ofApp::draw(){
    
         
 /** Scene 1  -  Voll mit Tex Vex, einzelne Flocken schneien runter (weiß auf Schwarz, als Fonts)**/
-        if(recordedFrame > scene0 && recordedFrame <= scene1 ){
+        if(recordedFrame > scene0 && recordedFrame <= scene1 && !bPause){
             
             texVecGetter.begin();
             ofClear(255,255,255,255);
@@ -528,7 +532,7 @@ void ofApp::draw(){
                 dirY *= drag;
                 texVecPosDraw[i].x += dirX + fakeWindX;
                 texVecPosDraw[i].y += dirY + fakeWindX;
-                texVecPosDraw[i].z -= growing * 0.0001;
+                texVecPosDraw[i].z -= ofSignedNoise(ofGetElapsedTimef()*0.2) * 1.5 + 2.5;
                 
                 ofSetColor(colTexVecs[i]);
                
@@ -540,7 +544,7 @@ void ofApp::draw(){
             
         }
 /** Scene 2   -  Tex Vex Effect, von dicht/dunkel nach wenig dicht/hell**/
-        if(recordedFrame > scene1 && recordedFrame <= scene2 ){
+        if(recordedFrame > scene1 && recordedFrame <= scene2 && !bPause){
             texVecGetter.begin();
             ofClear(255,255,255,255);
             
@@ -574,7 +578,7 @@ void ofApp::draw(){
             
             /** Tex Vecs **/
             growing++;
-            int texVecNumNew = ofMap(recordedFrame, scene0, scene2, texVecNum, 0 );
+            int texVecNumNew = ofMap((float) recordedFrame, scene0, scene2, (float) texVecNum, 0 );
             
             for (int i=0; i < texVecNumNew; i++){
                 // dirX =  (texVecsPosX[i] - center.x) * growing * 0.0001;
@@ -611,7 +615,7 @@ void ofApp::draw(){
                 
                 texVecPosDraw[i].x += dirX + fakeWindX;
                 texVecPosDraw[i].y += dirY + fakeWindX;
-                texVecPosDraw[i].z -= growing * 0.0001;
+                texVecPosDraw[i].z -= 0.8;
                 
                 ofSetColor(colTexVecs[i]);
                 
@@ -625,7 +629,7 @@ void ofApp::draw(){
         }
         
 /** Scene 3   -  Strophen bewegen sich, leichte Vis Effects**/
-        if(recordedFrame > scene2 && recordedFrame <= scene3 ){
+        if(recordedFrame > scene2 && recordedFrame <= scene3 && !bPause){
             /** Strophen global move **/
             for(int i=0;i< versesImg.size();i++){
                 vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
@@ -656,7 +660,7 @@ void ofApp::draw(){
         
 
 /** Scene 4   -  Strophen Explodieren, fliegen weg als Schnee   **/
-        if(recordedFrame > scene3 && recordedFrame <= scene4){
+        if(recordedFrame > scene3 && recordedFrame <= scene4 && !bPause){
             
             /*** schnipsel ***/
             for(unsigned int i = 0; i < p.size()-1; i++){
@@ -683,7 +687,7 @@ void ofApp::draw(){
         }
     
 /** END Recording **/
-        if(recordedFrame > scene4 && !bEnd){
+        if(recordedFrame > scene4 && !bEnd ){
             keyReleased('r');
             bEnd = true;
         }
@@ -703,8 +707,17 @@ void ofApp::draw(){
 //    ofSetColor(255,255,255,10);
 //    kuppelGrid.draw(0,0, fullWidth, fullHeight);
 
+    if((int)recordedFrame % (int)vidPart == 0 && !bPause && recordedFrame > 1){
+        bPause = true;
+        waitCounter = ofGetElapsedTimef();
+        keyReleased('r');
+    }
     
-   
+    if(ofGetElapsedTimef() - waitCounter > writeWaitTime && bPause){
+        bPause = false;
+        keyReleased('r');
+    }
+    
 }
 
 //--------------------------------------------------------------

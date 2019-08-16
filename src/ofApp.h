@@ -134,7 +134,10 @@ class ofApp : public ofBaseApp{
     
     vector <ofVec3f> texVecPosDraw;
     
-    int recordedFrame;
+    float   recordedFrame;
     
+
+    float   waitCounter     = 0;
+    bool    bPause = false;
     
 };

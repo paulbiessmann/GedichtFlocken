@@ -171,7 +171,7 @@ void customParticle::update(){
                 friction = 0.49;
                 frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 4.5 + 0.1;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.5;
-                frc.y = ofSignedNoise(uniqueVal, pos.y * 0.006, relTimef*0.2) * 0.7 - 0.95;
+                frc.y = ofSignedNoise(uniqueVal, pos.y * 0.006, relTimef*0.2) * 0.7 - 1.95;
 
             }
             else{

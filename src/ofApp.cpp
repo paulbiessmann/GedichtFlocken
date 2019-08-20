@@ -19,7 +19,7 @@ float scene3 = 5800; // so lange steht das Gedicht da
 float scene4 = 8400; // explosion reverse - Flocken werden zu Gedichten
 
 
-float vidPart         = 500; //frames in one vid
+float vidPart         = 750; //frames in one vid
 float writeWaitTime   = 150; //seconds waiting between recordings to reduce memory
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -92,7 +92,7 @@ void ofApp::setup(){
         versesImg[i].resize(oldWidth / imgScaleFac, oldHeight / imgScaleFac);
         vNum[i] = (versesImg[i].getWidth() / particleResolution) * (versesImg[i].getHeight()/particleResolution);
         
-        vPosVerse[i] = ofVec3f((fullWidth/8)*(i+1), ofRandom((fullHeight/2) - 500, (fullHeight/2) + 500), 0);
+        vPosVerse[i] = ofVec3f((fullWidth/7)*(i+1), ofRandom((fullHeight/2) - 500, (fullHeight/2) + 900), 0);
         
     }
     p1.assign(vNum[0], customParticle());
@@ -121,7 +121,7 @@ void ofApp::setup(){
     }
     
 /**** Snowflakes ****/
-    int numSnowflakes = 100;
+    int numSnowflakes = 5000;
     pSnowFlakes.resize(numSnowflakes);
     snowFlake.load("snow.png");
     snowFlake.resize(10,10);
@@ -198,8 +198,11 @@ void ofApp::initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis){
 
         pThis[i].setParticleImg(imgThis);
         pThis[i].setParticleSize(imgWidth, imgHeight);
-        pThis[i].setDrawMode(PARTICLE_MODE_TEXTURES);
+        pThis[i].setDrawMode(PARTICLE_MODE_POINTS);
         pThis[i].setParticleMode(PARTICLE_MODE_SNOW);
+        pThis[i].setParticleSize(5);
+        
+        pThis[i].setColor(ofColor(ofRandom(100,220), ofRandom(10,255)));
     }
 
 }
@@ -394,7 +397,7 @@ if(!bPause){
             }
             
             int pSnowSize ;
-            pSnowSize = recordedFrame*2;
+            pSnowSize = recordedFrame*50;
             if(pSnowSize >= pSnowFlakes.size()) {pSnowSize = pSnowFlakes.size();}
             for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
                 pSnowFlakes[i].addBlinky(200);
@@ -473,30 +476,7 @@ void ofApp::draw(){
             for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
             
             /** Strophen global move **/
-            for(int i=0;i< versesImg.size();i++){
-                vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
-
-                float velVerseX = 2.01 + sin(ofGetElapsedTimef() * 0.001) * 1.5;
-                float velVerseY = cos(ofGetElapsedTimef() * 0.08 * i ) * 0.46;
-                float velVerseZ = cos(ofGetElapsedTimef() * 0.06 * i ) * 0.1;
-
-                if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
-                    vPosVerse[i].x = -versesImg[i].getWidth();
-                }
-                if(vPosVerse[i].y > fullHeight - versesImg[i].getHeight() - 200){
-                    velVerseY = -velVerseY;
-                }
-                if(vPosVerse[i].x < - versesImg[i].getWidth()){
-                    vPosVerse[i].x = fullWidth + versesImg[i].getWidth();
-                }
-
-                vPosVerse[i].x += velVerseX * 0.3;
-                vPosVerse[i].y += velVerseY;
-                vPosVerse[i].z += velVerseZ;
-
-                ofSetColor(255);
-                versesImg[i].draw(vPosVerse[i].x  , vPosVerse[i].y , vPosVerse[i].z );
-            }
+            drawFullVerses();
             texVecGetter.end();
             texVecGetter.draw(0,0);
             
@@ -507,9 +487,9 @@ void ofApp::draw(){
             for (int i=0; i < texVecNumNew; i++){
                // dirX =  (texVecsPosX[i] - center.x) * growing * 0.0001;
                // dirY =  (texVecsPosY[i] - center.y) * growing * 0.0001;
-                float fakeWindX = ofSignedNoise(texVecPosDraw[i].x * 0.03, texVecPosDraw[i].y * 0.06, ofGetElapsedTimef() * 0.02);
-                dirX = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.06, ofGetElapsedTimef()*0.2) * 0.59 + 0.01;
-                dirY = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.02, ofGetElapsedTimef()*0.2) * 0.59 - 0.78;
+                float fakeWindX = ofSignedNoise(texVecPosDraw[i].x * 0.03, texVecPosDraw[i].y * 0.06, recordedFrame * 0.02);
+                dirX = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.06, recordedFrame*0.2) * 0.59 + 0.01;
+                dirY = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.02, recordedFrame*0.2) * 0.59 - 0.78;
                 
                 
                 if (texVecPosDraw[i].x + dirX > fullWidth ){
@@ -538,7 +518,8 @@ void ofApp::draw(){
                 dirY *= drag;
                 texVecPosDraw[i].x += dirX;// + fakeWindX;
                 texVecPosDraw[i].y += dirY;// + fakeWindX;
-                texVecPosDraw[i].z -= ofSignedNoise(ofGetElapsedTimef()*0.2) * 1.5 + 2.5;
+                texVecPosDraw[i].z -= ofSignedNoise(recordedFrame*0.2) * 1.5 + 2.5;
+                
                 
                 ofSetColor(colTexVecs[i]);
                
@@ -560,34 +541,8 @@ void ofApp::draw(){
             
             
             /** Strophen global move **/
-            for(int i=0;i< versesImg.size();i++){
-               // vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
-                
-                
-                float velVerseX = 1.01 + sin(ofGetElapsedTimef() * 0.001 ) * 0.5;
-                float velVerseY = cos(ofGetElapsedTimef() * 0.06 * i) * 0.04;
-                float velVerseZ = cos(ofGetElapsedTimef() * 0.06 *i ) * 0.04;
+            drawFullVerses();
 
-               
-                
-                if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
-                    vPosVerse[i].x = -versesImg[i].getWidth();
-                }
-                if(vPosVerse[i].y > fullHeight - versesImg[i].getHeight() - 200){
-                   velVerseY = -velVerseY;
-                }
-                if(vPosVerse[i].x < - versesImg[i].getWidth()){
-                    vPosVerse[i].x = fullWidth + versesImg[i].getWidth();
-                }
-                
-                vPosVerse[i].x += velVerseX;
-                vPosVerse[i].y += velVerseY;
-                vPosVerse[i].z += velVerseZ;
-                
-                
-                ofSetColor(255);
-                versesImg[i].draw(vPosVerse[i].x  , vPosVerse[i].y , vPosVerse[i].z );
-            }
             texVecGetter.end();
             texVecGetter.draw(0,0);
             
@@ -599,8 +554,8 @@ void ofApp::draw(){
                 // dirX =  (texVecsPosX[i] - center.x) * growing * 0.0001;
                 // dirY =  (texVecsPosY[i] - center.y) * growing * 0.0001;
                 float fakeWindX = ofSignedNoise(texVecPosDraw[i].x * 0.03, texVecPosDraw[i].y * 0.06, ofGetElapsedTimef() * 0.6);
-                dirX = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.06, ofGetElapsedTimef()*0.2) * 0.59 + 0.18;
-                dirY = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.02, ofGetElapsedTimef()*0.2) * 0.59 - 0.78;
+                dirX = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.06, recordedFrame*0.02) * 0.59 + 0.18;
+                dirY = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.02, recordedFrame*0.02) * 0.59 - 0.78;
                 
                 
                 if (texVecPosDraw[i].x + dirX > fullWidth ){
@@ -645,36 +600,16 @@ void ofApp::draw(){
         
 /** Scene 3   -  Strophen bewegen sich, leichte Vis Effects**/
         if(recordedFrame > scene2 && recordedFrame <= scene3){
-            /** Strophen global move **/
-            for(int i=0;i< versesImg.size();i++){
-                //vPosVerse[i] += ofSignedNoise(ofSignedNoise(ofGetElapsedTimef() * 0.01, i * 10), ofSignedNoise(ofGetElapsedTimef() * 0.01, (i+2) * 10));
-                
-                float velVerseX = 1.09 + sin(ofGetElapsedTimef() * 0.001 * i ) * 0.5;
-                float velVerseY = cos(ofGetElapsedTimef() * 0.006 * i ) * 0.04;
-                float velVerseZ = cos(ofGetElapsedTimef() * 0.06 * i ) * 0.7;
-
-                if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
-                    vPosVerse[i].x = -versesImg[i].getWidth();
-                }
-                if(vPosVerse[i].y > fullHeight - versesImg[i].getHeight() - 200){
-                    velVerseY = -velVerseY;
-                }
-                if(vPosVerse[i].x < - versesImg[i].getWidth()){
-                    vPosVerse[i].x = fullWidth + versesImg[i].getWidth();
-                }
-                
-                vPosVerse[i].x += velVerseX;
-                vPosVerse[i].y += velVerseY;
-                vPosVerse[i].z += velVerseZ;
-                
-                ofSetColor(255);
-                versesImg[i].draw(vPosVerse[i].x  , vPosVerse[i].y , vPosVerse[i].z );
-            }
-           
             /*** schnipsel ***/
             for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
+
+            
+            /** Strophen global move **/
+            drawFullVerses();
+
             for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
 
+         
         
         }
         
@@ -683,9 +618,11 @@ void ofApp::draw(){
         if(recordedFrame > scene3 ){
             
             /*** schnipsel ***/
+            for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
             for(unsigned int i = 0; i < p.size()-1; i++){
                 p[i].draw();
             }
+            
             //  for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
             
             if(!bInit){
@@ -704,6 +641,8 @@ void ofApp::draw(){
             for(unsigned int i = 0; i < p4.size()-particleResolution; i++){ p4[i].draw(); }
             for(unsigned int i = 0; i < p5.size()-particleResolution; i++){ p5[i].draw(); }
             for(unsigned int i = 0; i < p6.size()-particleResolution; i++){ p6[i].draw(); }
+            
+
         }
     
 /** END Recording **/
@@ -722,7 +661,7 @@ void ofApp::draw(){
    // glPopAttrib();
     
     recordFbo.end();
-    recordFbo.draw(0,0);
+    recordFbo.draw(0,0, fullWidth/10, fullHeight/10);
     
 //    ofSetColor(255,255,255,10);
 //    kuppelGrid.draw(0,0, fullWidth, fullHeight);
@@ -740,6 +679,31 @@ void ofApp::draw(){
     }
     
 }
+//--------------Strophen Global Move:-------------------------------------
+void ofApp::drawFullVerses(){
+    for(int i=0;i< versesImg.size();i++){
+        float rate = 0.02 + ofNoise(recordedFrame * 0.002, 10 * i) * 0.015;
+        //float value = ofSignedNoise( rate, x, y );
+        vPosVerse[i] += ofSignedNoise(ofSignedNoise(recordedFrame * 0.001, rate), ofSignedNoise(recordedFrame * 0.001, rate));
+        
+        float velVerseX = 3.91 + sin(recordedFrame * 0.001 + 10) * 1.5;
+        
+        if(vPosVerse[i].x > fullWidth + versesImg[i].getWidth()){
+            vPosVerse[i].x = -versesImg[i].getWidth();
+        }
+        if(vPosVerse[i].x < - versesImg[i].getWidth()){
+            vPosVerse[i].x = fullWidth + versesImg[i].getWidth();
+        }
+        
+        vPosVerse[i].x += velVerseX * 0.4;
+        vPosVerse[i].y = ofSignedNoise(recordedFrame * 0.001, i ) * 100.46 + 40*i - 40 + fullHeight/2 + sin(recordedFrame * 0.00003 * i ) * 10;
+        vPosVerse[i].z = ofSignedNoise(recordedFrame * 0.006 ,i ) * 30;
+        
+        ofSetColor(255);
+        versesImg[i].draw(vPosVerse[i].x  , vPosVerse[i].y , vPosVerse[i].z );
+    }
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){

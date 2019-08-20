@@ -17,6 +17,7 @@ class ofApp : public ofBaseApp{
 	void update();
 	void draw();
     void exit();
+    void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
     
     void resetSchnipsel();
     void resetParticles();
@@ -25,6 +26,7 @@ class ofApp : public ofBaseApp{
     void initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis);
     void initTexVecs();
     
+    void drawFullVerses();
 	
 	void keyPressed(int key);
 	void keyReleased(int key);
@@ -89,7 +91,6 @@ class ofApp : public ofBaseApp{
     string fileName;
     string fileExt;
     
-    void recordingComplete(ofxVideoRecorderOutputFileCompleteEventArgs& args);
     
     sceneMode mode;
     

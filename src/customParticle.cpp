@@ -141,9 +141,9 @@ void customParticle::update(){
     if(pMode == PARTICLE_MODE_EXPLODE){
         frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
         
-        friction = 0.29;
+        friction = 0.49;
         
-        if(relFrameNum < (50)){
+        if(relFrameNum < (3)){
             friction = 0.9;
             //frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
             frc.z = 0;
@@ -152,7 +152,7 @@ void customParticle::update(){
             
 
         }
-        else if(relFrameNum > (10) ){
+        else if(relFrameNum > (2) ){
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
             frc.x = fakeWindX * 3.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
 
@@ -163,32 +163,32 @@ void customParticle::update(){
 //            }
 
             if(pos.y < 700){
-                frc.z = -abs(frc.z) * 4;
+                frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 1.9 - 5.58;
                 frc.x = fakeWindX * 3.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
-                frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 2.65;
+                frc.y = fakeWindX * 1.25 + ofSignedNoise(uniqueVal, pos.x * 2.6, relTimef*0.2) * 0.9 - 2.65;
             }
             else if(pos.y > 1500){
-                friction = 0.49;
-                frc.x = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 4.5 + 0.1;
+                friction = 0.79;
+                frc.x = fakeWindX * 1.25 + ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 4.5 + 2.1;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.5;
-                frc.y = ofSignedNoise(uniqueVal, pos.y * 0.006, relTimef*0.2) * 0.7 - 1.95;
+                frc.y = ofSignedNoise(uniqueVal, pos.y * 0.6, relTimef*0.2) * 1.9 - 1.9;
 
             }
             else{
-                frc.x = fakeWindX * 4.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 4.8;
+                frc.x = fakeWindX * 5.25 + ofSignedNoise(uniqueVal, pos.y * 3.4) * 8.8 + 2.5;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.02) * 0.09 + 0.01;
-                frc.y = ofSignedNoise(uniqueVal, pos.y * 0.006, relTimef*0.2) * 0.7 - 0.95;
+                frc.y = fakeWindX * 1.25 + ofSignedNoise(uniqueVal, pos.y * 1.2, relTimef*1.2) * 1.9 - 1.91;
 
             }
         }
         else{
             frc.x = ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
-            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 + 0.35;
+            frc.y = fakeWindX * 1.25 + ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 1.9 + 1.25;
 
         }
         
-        drag  = ofRandom(0.67, 0.99);
+        drag  = ofRandom(0.57, 0.99);
         vel *= drag;
         vel += frc * 0.4 * (1.0 - friction);
         
@@ -239,7 +239,7 @@ void customParticle::update(){
             friction = 0.23;
             frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
             frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.58;
-            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.75;
+            frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 3.85;
             
             if(pos.y < 1000){
                 frc.z = -abs(frc.z) * 2;
@@ -254,7 +254,7 @@ void customParticle::update(){
             else{
                 frc.x = ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 2.5;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 0.18;
-                frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 0.75;
+                frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.9 - 2.75;
             }
         }
         
@@ -324,7 +324,7 @@ void customParticle::draw(){
     }
     else if(drawMode == PARTICLE_MODE_TEXTURES){
   
-        ofRotateZ(rotation);
+        //ofRotateZ(rotation);
         particleTexture.draw(pos.x, pos.y, pos.z, particleSizeX, particleSizeY);
 
 

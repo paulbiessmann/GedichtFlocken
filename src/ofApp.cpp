@@ -48,7 +48,7 @@ void ofApp::setup(){
     ofSetFrameRate((int) fps);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-    fileName = "Flocken";
+    fileName = "Flocken_Zusatz";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like

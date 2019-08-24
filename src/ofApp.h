@@ -11,6 +11,17 @@ enum sceneMode{
     MODE_TEX_GLITCH
 };
 
+struct groupParticles {
+    vector  <customParticle> p;
+    ofVec3f vPosVerse;
+    int     vNum;
+    ofImage versesImg;
+    float   uniqueVal;
+    ofVec3f vel;
+    bool    bInit;
+    float   relVerseAge;
+};
+
 class ofApp : public ofBaseApp{
   public:
 	void setup();
@@ -26,8 +37,9 @@ class ofApp : public ofBaseApp{
     void initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis);
     void initTexVecs();
     
-    void drawFullVerses();
-	
+    void updateFullVerses();
+    void drawFullVerses(int startNum);
+
 	void keyPressed(int key);
 	void keyReleased(int key);
 	void mouseMoved(int x, int y);
@@ -58,14 +70,9 @@ class ofApp : public ofBaseApp{
     
     ofxPostProcessing post;
     ofLight light;
+    ofLight light2;
     
     vector <customParticle> p;
-    vector <customParticle> p1;
-    vector <customParticle> p2;
-    vector <customParticle> p3;
-    vector <customParticle> p4;
-    vector <customParticle> p5;
-    vector <customParticle> p6;
     
     int particleResolution;
     
@@ -76,6 +83,10 @@ class ofApp : public ofBaseApp{
     
     vector <customParticle> pSnowFlakes;
     ofImage snowFlake;
+    
+
+    
+    
     
     ofImage kuppelGrid;
     
@@ -132,13 +143,21 @@ class ofApp : public ofBaseApp{
     ofFbo   texVecGetter;
     float dirX = 0;
     float dirY = 0;
+    float dirZ = 0;
     
     vector <ofVec3f> texVecPosDraw;
     
-    float   recordedFrame;
+    int   iColorUpdate = 0;
+    int   iAlphaUpdate = 220;
+
     
+    unsigned long   recordedFrame;
+    float   relativeFr;
+    int     gPUpdateSize;
 
     float   waitCounter     = 0;
     bool    bPause = false;
+    
+    bool    bFirstCallScene3 = true;
     
 };

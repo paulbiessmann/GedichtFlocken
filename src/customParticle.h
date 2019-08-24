@@ -21,7 +21,8 @@ enum particleDrawMode{
 enum particleMode{
     PARTICLE_MODE_EXPLODE,
     PARTICLE_MODE_SNOW,
-    PARTICLE_MODE_TEX_GLITCH
+    PARTICLE_MODE_TEX_GLITCH,
+    PARTICLE_MODE_LAYER
 };
 
 
@@ -44,7 +45,7 @@ public:
     void setParticleImg(ofImage &image);
     void setGlobalPos(ofVec3f _xyz);
     
-    void addBlinky(float blinkyness);
+    void addBlinky(float blinkyness, float staticVal);
 
     void reset();
     void update();
@@ -61,13 +62,15 @@ public:
     
     ofVec3f gravity;
     
+    float age;
+    
     float drag;
     float uniqueVal;
     float scale;
     
     ofImage particleTexture;
     ofColor customColor;
-    
+        
     int     particleSize = 3;
     int     particleSizeX = 10;
     int     particleSizeY = 10;

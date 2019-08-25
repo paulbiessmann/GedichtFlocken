@@ -7,8 +7,8 @@
 float fps = 25;
 
 // struct that contains the Verses, that will explode to particles
-int numGP = 70 + 34;
-groupParticles gP[104];
+int numGP = 70 + 30;
+groupParticles gP[100];
 
 /*** Wird rückwärts abgespielt, szenen von 4 -> 1 am Ende ***/
 /*     immer < scene. 0 < Szene 1 < scene1; scene1 < Szene 2 < scene2; usw     */
@@ -70,13 +70,14 @@ void ofApp::setup(){
     int numVerses       = 6;
     int numSchnipsel    = 30;
     int numVersN        = 34;
+    int numVersNadd     = 30;
     int numGPart = numGP;//numSchnipsel + numVersN + numVerses;
     vector <string> fileP;
     fileP.resize(numGP);
     for(int i=0; i<numSchnipsel; i++){  fileP[i] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
     for(int i=0; i<numVersN; i++){      fileP[i+numSchnipsel] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numVersN; i++){      fileP[i+numSchnipsel+numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numVerses; i++){     fileP[i+numSchnipsel+numVersN+numVersN] = "Strophen/" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVersNadd; i++){      fileP[i+numSchnipsel+numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVerses; i++){     fileP[i+numSchnipsel+numVersN+numVersNadd] = "Strophen/" + ofToString(i+1) + ".png"; }
     
 
     bFirstCallScene3 = true;
@@ -125,7 +126,7 @@ void ofApp::setup(){
     
     
 /**** Snowflakes ****/
-    int numSnowflakes = 5000;
+    int numSnowflakes = 3500;
     pSnowFlakes.resize(numSnowflakes);
     snowFlake.load("snow.png");
     snowFlake.resize(10,10);
@@ -147,7 +148,7 @@ void ofApp::setup(){
 
 /** Tex Vec **/
     texVecGetter.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
-    texVecNum = 8000;
+    texVecNum = 8500;
     initTexVecs();
     
     
@@ -176,7 +177,7 @@ void ofApp::initTexVecs(){
         texVecsPosX[i]   = ofRandom((int) 0, fullWidth );
         texVecsPosY[i]   = ofRandom((int) 0, fullHeight);
         texVecsPosZ[i]   = ofRandom((int) -10, 1000);
-        colTexVecs[i]    = ofColor(ofRandom(80, 90), ofRandom(80,90), ofRandom(80,90), ofRandom(150, 220));
+        colTexVecs[i]    = ofColor(ofRandom(80, 85), ofRandom(80,85), ofRandom(80,85), ofRandom(160, 220));
         
         texVecPosDraw[i].x = ofRandom(0, fullWidth) ;
         texVecPosDraw[i].y = ofRandom(0, fullHeight) ;
@@ -199,7 +200,7 @@ void ofApp::initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis){
         pThis[i].setParticleMode(PARTICLE_MODE_SNOW);
         pThis[i].setParticleSize(10);
         
-        pThis[i].setColor(ofColor(ofRandom(100,220), ofRandom(10,155)));
+        pThis[i].setColor(ofColor(ofRandom(100,220), ofRandom(10,100)));
     }
 
 }
@@ -340,11 +341,12 @@ if(!bPause){
               relativeFr = recordedFrame;
               bFirstCallScene3 = false;
           }else{
-              gPUpdateSize = (recordedFrame - relativeFr) * 0.08;
+              gPUpdateSize = (recordedFrame - relativeFr) * 0.06;
           }
           if(gPUpdateSize >= numGP) {gPUpdateSize = numGP;}
           if(gPUpdateSize < 2) {gPUpdateSize = 1;}
 
+          
           updateFullVerses();
           if(0 < numGP){
               for(int j=0; j<numGP; j++){
@@ -466,13 +468,13 @@ void ofApp::draw(){
                     texVecPosDraw[i].x = fullWidth + 100;
                 }
                 
-                if (texVecPosDraw[i].y + dirY > fullHeight + 100){
-                    dirY = -dirY;
-                    texVecPosDraw[i].y= -100;
+                if (texVecPosDraw[i].y + dirY > fullHeight + 0){
+                    //dirY = -dirY;
+                    texVecPosDraw[i].y= 0;
                 }
-                if (texVecPosDraw[i].y + dirY < -100){
-                    dirY = -dirY;
-                    texVecPosDraw[i].y = fullHeight + 100;
+                if (texVecPosDraw[i].y + dirY < 0){
+                    //dirY = -dirY;
+                    texVecPosDraw[i].y = fullHeight + 0;
                 }
                 if (texVecPosDraw[i].z < - 1000){
                     texVecPosDraw[i].z = 1000;
@@ -502,7 +504,7 @@ void ofApp::draw(){
                 texVecPosDraw[i].z += dirZ;
                 
                 
-                if ((int)recordedFrame % 30 == 0){
+                if ((int)recordedFrame % 29 == 0){
                     colTexVecs[i].r++;
                     colTexVecs[i].g++;
                     colTexVecs[i].b++;
@@ -714,14 +716,14 @@ void ofApp::updateFullVerses(){
         frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
         frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06 + i, t*0.2) * 0.5;
         frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06 * i, t*0.002 * i) * 0.9 + 0.78;
-        frc.y = fakeWindX * 0.1 + ofSignedNoise(uniqueVal, pos.x * 0.006 + i, t*0.2) * 0.5 - 0.7;
+        frc.y = fakeWindX * 0.1 + ofSignedNoise(uniqueVal, pos.x * 0.006 + i, t*0.2) * 0.5 - 0.9;
         
         
         float rate = 0.02 + ofNoise(recordedFrame * 0.002, 10 * i) * 0.015;
         gP[i].vPosVerse += ofSignedNoise(ofSignedNoise(recordedFrame * 0.001, rate), ofSignedNoise(recordedFrame * 0.001, rate));
         
         frc.x += rate + sin(recordedFrame * 0.001 + 10 + i) * 0.5;
-        frc.y -= rate + sin(recordedFrame * 0.001 + 10 + i) * 0.1 ;
+        frc.y -= rate + sin(recordedFrame * 0.001 + 10 + i) * 0.1;
 
         
         float drag  = ofRandom(0.87, 0.99);

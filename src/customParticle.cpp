@@ -179,7 +179,7 @@ void customParticle::update(){
             //frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
             frc.z = fakeWindZ * 3.1 + ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 + 5.68;
             frc.x = fakeWindX * 3.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
-            frc.y = fakeWindZ * 1.25 + ofSignedNoise(uniqueVal, pos.x * 2.6, relTimef*0.2) * 2.9 + 1.25;
+            frc.y = fakeWindZ * 1.25 + ofSignedNoise(uniqueVal, pos.x * 2.6, relTimef*0.2) * 2.9 + 1.05;
 
         }
         else{
@@ -267,7 +267,7 @@ void customParticle::update(){
             if(pos.y < 1000){
                 frc.z = -abs(frc.z);
                 frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
-                frc.y = fakeWindX * ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.002) * 100.9 - 2.65;
+                frc.y = fakeWindX * 0.2 + ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.002) * 80.9 - 2.65;
             }
             else if(pos.y > 1500){
                 friction = abs(sin(relTimef *0.001)) * 0.39 + 0.39 ;
@@ -337,10 +337,10 @@ void customParticle::update(){
         if(relFrameNum > 1){
             
             
-            if(pos.y < 400){
+            if(pos.y < 300){
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 1.08;
                 frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 3.8;
-                frc.y = fakeWindX * ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.002) * 100.9 - 2.65;
+                frc.y = fakeWindX  * 0.2 +  ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.002) * 50.9 - 2.65;
             }
             else{
                 frc.x = fakeWindX*ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 4.5;

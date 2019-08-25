@@ -15,10 +15,10 @@ groupParticles gP[100];
 
 // Reverse gerechnet:
 float scene0 = 0;    // Black
-float scene1 = 2;//2400;//2400; // zusätzlich einzelne Textflocken
-float scene2 = 42;//4200;//4200; // Tex Vec Effekt
-float scene3 = 500;//5000;//6000; // so lange steht das Gedicht da
-float scene4 = 900;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
+float scene1 = 2400;//2400;//2400; // zusätzlich einzelne Textflocken
+float scene2 = 4200;//4200;//4200; // Tex Vec Effekt
+float scene3 = 5000;//5000;//6000; // so lange steht das Gedicht da
+float scene4 = 9000;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
 
 
 float vidPart         = 500; //frames in one vid till pause
@@ -126,7 +126,7 @@ void ofApp::setup(){
     
     
 /**** Snowflakes ****/
-    int numSnowflakes = 3500;
+    int numSnowflakes = 4000;
     pSnowFlakes.resize(numSnowflakes);
     snowFlake.load("snow.png");
     snowFlake.resize(10,10);
@@ -372,7 +372,7 @@ if(!bPause){
         if(recordedFrame > scene0 && !bPause){
             
             int pSnowSize ;
-            pSnowSize = recordedFrame * 1;
+            pSnowSize = recordedFrame * 2;
             if(pSnowSize >= pSnowFlakes.size()) {pSnowSize = pSnowFlakes.size();}
             for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
                 pSnowFlakes[i].addBlinky(100, 80);
@@ -838,8 +838,6 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 void ofApp::exit(){
     ofRemoveListener(vidRecorder.outputFileCompleteEvent, this, &ofApp::recordingComplete);
     vidRecorder.close();
-    
-    
 }
 
 //--------------------------------------------------------------

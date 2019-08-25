@@ -15,10 +15,10 @@ groupParticles gP[100];
 
 // Reverse gerechnet:
 float scene0 = 0;    // Black
-float scene1 = 2400;//2400;//2400; // zusätzlich einzelne Textflocken
-float scene2 = 4200;//4200;//4200; // Tex Vec Effekt
-float scene3 = 5000;//5000;//6000; // so lange steht das Gedicht da
-float scene4 = 9000;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
+float scene1 = 2;//2400;//2400; // zusätzlich einzelne Textflocken
+float scene2 = 42;//4200;//4200; // Tex Vec Effekt
+float scene3 = 500;//5000;//6000; // so lange steht das Gedicht da
+float scene4 = 900;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
 
 
 float vidPart         = 500; //frames in one vid till pause
@@ -42,7 +42,7 @@ void ofApp::setup(){
     ofSetFrameRate((int) fps);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-    fileName = "Flocken_v2";
+    fileName = "Flocken_v3";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like
@@ -197,7 +197,7 @@ void ofApp::initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis){
         pThis[i].setParticleImg(imgThis);
         pThis[i].setParticleSize(imgWidth, imgHeight);
         pThis[i].setDrawMode(PARTICLE_MODE_POINTS);
-        pThis[i].setParticleMode(PARTICLE_MODE_SNOW);
+        pThis[i].setParticleMode(PARTICLE_MODE_LAYER);
         pThis[i].setParticleSize(10);
         
         pThis[i].setColor(ofColor(ofRandom(100,220), ofRandom(10,100)));
@@ -335,13 +335,12 @@ void ofApp::update(){
 if(!bPause){
       if(recordedFrame > scene3 && !bPause){
 
-         // gPUpdateSize = (int)(recordedFrame - relativeFr) * 0.1; // TODO ! 24.08. faktor größer als 0.01 recordedFrama NaN? gUpdateSize riesen groß
           if(bFirstCallScene3){
               gPUpdateSize = 1;
               relativeFr = recordedFrame;
               bFirstCallScene3 = false;
           }else{
-              gPUpdateSize = (recordedFrame - relativeFr) * 0.06;
+              gPUpdateSize = (recordedFrame - relativeFr) * 0.04;
           }
           if(gPUpdateSize >= numGP) {gPUpdateSize = numGP;}
           if(gPUpdateSize < 2) {gPUpdateSize = 1;}
@@ -358,7 +357,7 @@ if(!bPause){
           for(int j=0; j<gPUpdateSize; j++){
                 int pUpSize;
                 gP[j].relVerseAge++;
-                pUpSize = (gP[j].relVerseAge) * 5;
+                pUpSize = (gP[j].relVerseAge) * 6;
                 if(pUpSize >= gP[j].p.size()) {pUpSize = gP[j].p.size();}
                 if(pUpSize < 0) {pUpSize = 0;}
 
@@ -373,7 +372,7 @@ if(!bPause){
         if(recordedFrame > scene0 && !bPause){
             
             int pSnowSize ;
-            pSnowSize = recordedFrame*50;
+            pSnowSize = recordedFrame * 1;
             if(pSnowSize >= pSnowFlakes.size()) {pSnowSize = pSnowFlakes.size();}
             for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
                 pSnowFlakes[i].addBlinky(100, 80);

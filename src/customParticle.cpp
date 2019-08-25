@@ -177,8 +177,8 @@ void customParticle::update(){
         else if(relFrameNum < 300){
             friction = 0.89;
             //frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.09 + 0.58;
-            frc.z = fakeWindZ * 3.1 + ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 + 5.68;
-            frc.x = fakeWindX * 3.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
+            frc.z = fakeWindZ * 4.1 + ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 + 5.68;
+            frc.x = fakeWindX * 4.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 2.8;
             frc.y = fakeWindZ * 1.25 + ofSignedNoise(uniqueVal, pos.x * 2.6, relTimef*0.2) * 2.9 + 1.05;
 
         }
@@ -227,13 +227,13 @@ void customParticle::update(){
         if( pos.x + vel.x + globalPos.x > fullWidth + 20  ){
             pos.x -= fullWidth - 20;
         }
-        if( pos.y + vel.y + pos.z + globalPos.y> fullHeight ){
+        if( pos.y + vel.y + pos.z + globalPos.y > fullHeight ){
             pos.y = fullHeight + pos.z;
-            vel.y *= -1.0;
+            //vel.y *= -1.0;
         }
         else if( pos.y + vel.y - pos.z + globalPos.y < 0 ){
             pos.y = 0  + pos.z;
-            vel.y *= -1.0;
+            //vel.y *= -1.0;
         }
         if(pos.z + vel.z + globalPos.z > 400){
             vel.z = -4;
@@ -325,7 +325,7 @@ void customParticle::update(){
     /*** LAYER 2 Double Snow ***/
     else if(pMode == PARTICLE_MODE_LAYER){
         fakeWindX = ofSignedNoise(pos.x * 0.04, pos.y * 0.09, relTimef * 0.07);
-        friction = 0.69;
+        friction = 0.49;
         
         
         frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
@@ -334,39 +334,42 @@ void customParticle::update(){
         frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.2 - 0.15;
         
         
-        if(relFrameNum > 1){
+        if(relFrameNum > 100){
             
-            
-            if(pos.y < 300){
-                frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 1.08;
-                frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 3.8;
-                frc.y = fakeWindX  * 0.2 +  ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.002) * 50.9 - 2.65;
+            if(pos.y < 1000){
+                frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 2.38;
+                frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 1.8;
+                frc.y = fakeWindX  * 0.2 +  ofNoise(uniqueVal, pos.x * 0.006, relTimef*0.002) * 5.9 - 6.25;
             }
             else{
-                frc.x = fakeWindX*ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 4.5;
+                frc.x = fakeWindX * 1.5 +ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 1.9;
                 frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 + 0.08;
-                frc.y = fakeWindX * ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.02) * 1.9 - 1.05;
+                frc.y = fakeWindX * ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.02) * 1.9 - 2.75;
             }
         }
         
-        
+        if( pos.z + vel.z < -3000 ){
+            pos.z = 0;
+            pos.y = fullHeight;
+        }
+        if( pos.y + globalPos.y + vel.y > fullHeight + 400 ){
+            pos.y = 0;
+        }
+        if( pos.y + globalPos.y + vel.y < -300 ){
+            pos.y = fullHeight;
+        }
+        if( pos.x + vel.x + globalPos.x > fullWidth  ){
+            pos.x -= fullWidth;
+        }
         
         
         drag  = ofRandom(0.40, 0.99);
         vel *= drag * 1.19;
-        vel += frc * 0.4 * (1.0 - friction);
+        vel += frc * 0.5 * (1.0 - friction);
         
         //2 - UPDATE OUR POSITION
         pos += vel;
-            if( pos.z + globalPos.z < -2000 ){
-                pos.z = -100;
-            }
-            if( pos.y + vel.y + globalPos.z > fullHeight ){
-                pos.y -= fullHeight;
-            }
-            if( pos.x + vel.x + globalPos.x > fullWidth  ){
-                pos.x -= fullWidth;
-            }
+        
     
     }
 

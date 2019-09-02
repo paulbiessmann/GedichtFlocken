@@ -17,7 +17,7 @@ groupParticles gP[100];
 float scene0 = 0;    // Black
 float scene1 = 2400;//2400;//2400; // zusätzlich einzelne Textflocken
 float scene2 = 4200;//4200;//4200; // Tex Vec Effekt
-float scene3 = 6000;//5000;//6000; // so lange steht das Gedicht da
+float scene3 = 5050;//5000;//6000; // so lange steht das Gedicht da
 float scene4 = 9000;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
 
 
@@ -42,7 +42,7 @@ void ofApp::setup(){
     ofSetFrameRate((int) fps);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-    fileName = "Flocken_v3-2";
+    fileName = "Flocken_v3-3";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like
@@ -148,7 +148,7 @@ void ofApp::setup(){
 
 /** Tex Vec **/
     texVecGetter.allocate(ofGetWidth(), ofGetHeight(), GL_RGB);
-    texVecNum = 8500;
+    texVecNum = 10000;
     initTexVecs();
     
     
@@ -177,7 +177,7 @@ void ofApp::initTexVecs(){
         texVecsPosX[i]   = ofRandom((int) 0, fullWidth );
         texVecsPosY[i]   = ofRandom((int) 0, fullHeight);
         texVecsPosZ[i]   = ofRandom((int) -10, 1000);
-        colTexVecs[i]    = ofColor(ofRandom(80, 85), ofRandom(80,85), ofRandom(80,85), ofRandom(160, 220));
+        colTexVecs[i]    = ofColor(ofRandom(70, 75), ofRandom(70,75), ofRandom(70,75), ofRandom(170, 230));
         
         texVecPosDraw[i].x = ofRandom(0, fullWidth) ;
         texVecPosDraw[i].y = ofRandom(0, fullHeight) ;
@@ -340,7 +340,7 @@ if(!bPause){
               relativeFr = recordedFrame;
               bFirstCallScene3 = false;
           }else{
-              gPUpdateSize = (recordedFrame - relativeFr) * 0.08;
+              gPUpdateSize = (recordedFrame - relativeFr) * 0.07;
           }
           if(gPUpdateSize >= numGP) {gPUpdateSize = numGP;}
           if(gPUpdateSize < 2) {gPUpdateSize = 1;}
@@ -456,7 +456,7 @@ void ofApp::draw(){
                 float fakeWindX = ofSignedNoise(texVecPosDraw[i].x * 0.03, texVecPosDraw[i].y * 0.06, recordedFrame * 0.02);
                 dirX = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.06, recordedFrame*0.2) * 0.59 + 0.01;
                 dirY = ofSignedNoise(texVecPosDraw[i].y, texVecPosDraw[i].z * 0.02, recordedFrame*0.2) * 0.59 - 0.78;
-                dirZ = ofSignedNoise(recordedFrame * 0.02 * i) * 1.5 - 3.5;
+                dirZ = ofSignedNoise(recordedFrame * 0.02 * i) * 1.5 - 3.0;
                 
                 if (texVecPosDraw[i].x + dirX > fullWidth +100){
                     dirX = -dirX;

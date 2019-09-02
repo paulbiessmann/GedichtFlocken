@@ -42,7 +42,7 @@ void ofApp::setup(){
     ofSetFrameRate((int) fps);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-    fileName = "Flocken_v3-1";
+    fileName = "Flocken_v3-2";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like
@@ -357,7 +357,7 @@ if(!bPause){
           for(int j=0; j<gPUpdateSize; j++){
                 int pUpSize;
                 gP[j].relVerseAge++;
-                pUpSize = (gP[j].relVerseAge) * 8;
+                pUpSize = (gP[j].relVerseAge) * 30;
                 if(pUpSize >= gP[j].p.size()) {pUpSize = gP[j].p.size();}
                 if(pUpSize < 0) {pUpSize = 0;}
 
@@ -739,13 +739,13 @@ void ofApp::updateFullVerses(){
         if(gP[i].vPosVerse.x > fullWidth + gP[i].versesImg.getWidth()){
             gP[i].vPosVerse.x = -gP[i].versesImg.getWidth();
         }
-        if(gP[i].vPosVerse.x < - gP[i].versesImg.getWidth()){
+        if(gP[i].vPosVerse.x  < - gP[i].versesImg.getWidth()){
             gP[i].vPosVerse.x = fullWidth + gP[i].versesImg.getWidth();
         }
         if(gP[i].vPosVerse.y > fullHeight + gP[i].versesImg.getHeight()){
             gP[i].vPosVerse.y = -gP[i].versesImg.getHeight();
         }
-        if(gP[i].vPosVerse.y < - gP[i].versesImg.getHeight()){
+        if(gP[i].vPosVerse.y  < - gP[i].versesImg.getHeight()){
             gP[i].vPosVerse.y = fullHeight;
         }
         

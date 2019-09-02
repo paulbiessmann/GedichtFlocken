@@ -228,12 +228,12 @@ void customParticle::update(){
             pos.x -= fullWidth - 20;
         }
         if( pos.y + vel.y + pos.z + globalPos.y > fullHeight ){
-            pos.y = fullHeight + pos.z;
-            //vel.y *= -1.0;
+            //pos.y = fullHeight + pos.z;
+            vel.y *= -1.0;
         }
         else if( pos.y + vel.y - pos.z + globalPos.y < 0 ){
-            pos.y = 0  + pos.z;
-            //vel.y *= -1.0;
+            //pos.y = 0  + pos.z;
+            vel.y *= -1.0;
         }
         if(pos.z + vel.z + globalPos.z > 400){
             vel.z = -4;

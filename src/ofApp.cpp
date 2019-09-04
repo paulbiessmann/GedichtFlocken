@@ -17,7 +17,7 @@ groupParticles gP[100];
 float scene0 = 0;    // Black
 float scene1 = 2400;//2400;//2400; // zusätzlich einzelne Textflocken
 float scene2 = 4200;//4200;//4200; // Tex Vec Effekt
-float scene3 = 5050;//5000;//6000; // so lange steht das Gedicht da
+float scene3 = 5050;//5050;//6000; // so lange steht das Gedicht da
 float scene4 = 9000;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
 
 
@@ -42,7 +42,7 @@ void ofApp::setup(){
     ofSetFrameRate((int) fps);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-    fileName = "Flocken_v3-3";
+    fileName = "Flocken_v3-4";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like
@@ -340,7 +340,7 @@ if(!bPause){
               relativeFr = recordedFrame;
               bFirstCallScene3 = false;
           }else{
-              gPUpdateSize = (recordedFrame - relativeFr) * 0.07;
+              gPUpdateSize = (recordedFrame - relativeFr) * 0.06; //0.07
           }
           if(gPUpdateSize >= numGP) {gPUpdateSize = numGP;}
           if(gPUpdateSize < 2) {gPUpdateSize = 1;}
@@ -357,7 +357,7 @@ if(!bPause){
           for(int j=0; j<gPUpdateSize; j++){
                 int pUpSize;
                 gP[j].relVerseAge++;
-                pUpSize = (gP[j].relVerseAge) * 30;
+                pUpSize = gP[j].p.size();//(gP[j].relVerseAge) * 1000;
                 if(pUpSize >= gP[j].p.size()) {pUpSize = gP[j].p.size();}
                 if(pUpSize < 0) {pUpSize = 0;}
 

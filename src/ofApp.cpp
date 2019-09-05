@@ -7,8 +7,8 @@
 float fps = 25;
 
 // struct that contains the Verses, that will explode to particles
-int numGP = 70 + 30;
-groupParticles gP[100];
+int numGP = 186+34;
+groupParticles gP[186+34];
 
 /*** Wird rückwärts abgespielt, szenen von 4 -> 1 am Ende ***/
 /*     immer < scene. 0 < Szene 1 < scene1; scene1 < Szene 2 < scene2; usw     */
@@ -17,7 +17,7 @@ groupParticles gP[100];
 float scene0 = 0;    // Black
 float scene1 = 2400;//2400;//2400; // zusätzlich einzelne Textflocken
 float scene2 = 4200;//4200;//4200; // Tex Vec Effekt
-float scene3 = 5050;//5050;//6000; // so lange steht das Gedicht da
+float scene3 = 4900;//5000;//6000; // so lange steht das Gedicht da
 float scene4 = 9000;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
 
 
@@ -42,7 +42,7 @@ void ofApp::setup(){
     ofSetFrameRate((int) fps);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-    fileName = "Flocken_v3-4";
+    fileName = "Flocken_v3-5";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like
@@ -70,20 +70,30 @@ void ofApp::setup(){
     int numVerses       = 6;
     int numSchnipsel    = 30;
     int numVersN        = 34;
-    int numVersNadd     = 30;
+    int numVersNadd     = 34;
+    
     int numGPart = numGP;//numSchnipsel + numVersN + numVerses;
     vector <string> fileP;
     fileP.resize(numGP);
     for(int i=0; i<numSchnipsel; i++){  fileP[i] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numVersN; i++){      fileP[i+numSchnipsel] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numVersNadd; i++){      fileP[i+numSchnipsel+numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numVerses; i++){     fileP[i+numSchnipsel+numVersN+numVersNadd] = "Strophen/" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVerses; i++){     fileP[i+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVerses; i++){     fileP[i+numVerses+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVerses; i++){     fileP[i+2*numVerses+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
+
+    for(int i=0; i<numVersN; i++){      fileP[i+3*(numVerses)+numSchnipsel] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
+
+    for(int i=0; i<numVersN; i++){      fileP[i+3*(numVerses)+numSchnipsel+numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVersNadd; i++){   fileP[i+3*(numVerses)+numSchnipsel+2*numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numSchnipsel; i++){  fileP[i+3*(numVerses)+numSchnipsel+2*numVersN+numVersNadd] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numSchnipsel; i++){  fileP[i+3*(numVerses)+numSchnipsel+2*numVersN+2*numVersNadd] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
+
+    for(int i=0; i<numVerses; i++){     fileP[i+3*numVerses+numSchnipsel+2*numVersN+2*numVersNadd+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
     
 
     bFirstCallScene3 = true;
     
     float imgScaleFac = 4; //4
-    particleResolution = 8;
+    particleResolution = 10; //8
 
 /**** Explode Particles ****/
     for (int i=0; i< numGP; i++){
@@ -93,7 +103,7 @@ void ofApp::setup(){
         
         if(i>numSchnipsel+numVersN+numVersN){
             gP[i].versesImg.resize(oldWidth / 3, oldHeight / 3);
-            gP[i].vPosVerse = ofVec3f(ofRandom(fullWidth-500), ofRandom(fullHeight- 300), ofRandom(5,10));
+            gP[i].vPosVerse = ofVec3f(ofRandom(fullWidth-500), ofRandom(fullHeight- 500), ofRandom(5,10));
         }
         else{
             gP[i].versesImg.resize(oldWidth / imgScaleFac, oldHeight / imgScaleFac);
@@ -126,7 +136,7 @@ void ofApp::setup(){
     
     
 /**** Snowflakes ****/
-    int numSnowflakes = 4000;
+    int numSnowflakes = 10000;
     pSnowFlakes.resize(numSnowflakes);
     snowFlake.load("snow.png");
     snowFlake.resize(10,10);
@@ -198,7 +208,7 @@ void ofApp::initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis){
         pThis[i].setParticleSize(imgWidth, imgHeight);
         pThis[i].setDrawMode(PARTICLE_MODE_POINTS);
         pThis[i].setParticleMode(PARTICLE_MODE_LAYER);
-        pThis[i].setParticleSize(10);
+        pThis[i].setParticleSize(13);
         
         pThis[i].setColor(ofColor(ofRandom(100,220), ofRandom(10,100)));
     }
@@ -265,7 +275,7 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
                 ofImage pxImage = imgThis;
                 pxImage.crop(i,j,particleResolution,particleResolution);
 
-                pThis[pCount].setColor(ofColor(255,255,255,255));
+                pThis[pCount].setColor(ofColor(255,255,255,180));
                 pThis[pCount].setParticleImg(pxImage);
                 pThis[pCount].setPos(ofVec3f(i, j, 0));//ofRandom(-100,100)));
                 pThis[pCount].setParticleSize(particleResolution);
@@ -357,7 +367,7 @@ if(!bPause){
           for(int j=0; j<gPUpdateSize; j++){
                 int pUpSize;
                 gP[j].relVerseAge++;
-                pUpSize = gP[j].p.size();//(gP[j].relVerseAge) * 1000;
+                pUpSize = (gP[j].relVerseAge) * 100;
                 if(pUpSize >= gP[j].p.size()) {pUpSize = gP[j].p.size();}
                 if(pUpSize < 0) {pUpSize = 0;}
 
@@ -762,7 +772,7 @@ void ofApp::drawFullVerses(int startNum){
     float t = recordedFrame/fps;
     
     for(int i=startNum;i< numGP;i++){
-        ofSetColor(255);
+        ofSetColor(255, 180);
         gP[i].versesImg.draw(gP[i].vPosVerse.x  , gP[i].vPosVerse.y , gP[i].vPosVerse.z );
         
     }

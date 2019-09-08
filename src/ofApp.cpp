@@ -7,8 +7,8 @@
 float fps = 25;
 
 // struct that contains the Verses, that will explode to particles
-int numGP = 186+34;
-groupParticles gP[186+34];
+int numGP = 186+30;//186+34;
+groupParticles gP[186+30];
 
 /*** Wird rückwärts abgespielt, szenen von 4 -> 1 am Ende ***/
 /*     immer < scene. 0 < Szene 1 < scene1; scene1 < Szene 2 < scene2; usw     */
@@ -16,8 +16,9 @@ groupParticles gP[186+34];
 // Reverse gerechnet:
 float scene0 = 0;    // Black
 float scene1 = 2400;//2400;//2400; // zusätzlich einzelne Textflocken
+float scene1_5 = 3425;//3425; //NEU zusätzliche flocken
 float scene2 = 4200;//4200;//4200; // Tex Vec Effekt
-float scene3 = 4900;//5000;//6000; // so lange steht das Gedicht da
+float scene3 = 4900;//4900;//6000; // so lange steht das Gedicht da, bei 3425
 float scene4 = 9000;//9000;//8400; // explosion reverse - Flocken werden zu Gedichten - mit Fleisch
 
 
@@ -85,9 +86,9 @@ void ofApp::setup(){
     for(int i=0; i<numVersN; i++){      fileP[i+3*(numVerses)+numSchnipsel+numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
     for(int i=0; i<numVersNadd; i++){   fileP[i+3*(numVerses)+numSchnipsel+2*numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
     for(int i=0; i<numSchnipsel; i++){  fileP[i+3*(numVerses)+numSchnipsel+2*numVersN+numVersNadd] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numSchnipsel; i++){  fileP[i+3*(numVerses)+numSchnipsel+2*numVersN+2*numVersNadd] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numSchnipsel; i++){  fileP[i+3*(numVerses)+2*numSchnipsel+2*numVersN+numVersNadd] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
 
-    for(int i=0; i<numVerses; i++){     fileP[i+3*numVerses+numSchnipsel+2*numVersN+2*numVersNadd+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVerses; i++){     fileP[i+3*numVerses+3*numSchnipsel+2*numVersN+numVersNadd] = "Strophen/" + ofToString(i+1) + ".png"; }
     
 
     bFirstCallScene3 = true;
@@ -112,6 +113,8 @@ void ofApp::setup(){
         
         gP[i].vNum = ( gP[i].versesImg.getWidth() / particleResolution) * ( gP[i].versesImg.getHeight()/particleResolution);
         
+        gP[i].vColorVerse = ofColor(255, 255, 255, ofRandom(150, 220));;
+        
         gP[i].p.assign( gP[i].vNum, customParticle() );
         gP[i].bInit     = false;
     }
@@ -119,7 +122,7 @@ void ofApp::setup(){
     
  /**** Schnipsel ****/
     float fullTexScaleFac       = 25; // -> origSize/scaleFac
-    numFullTexParticles         = 2; // so viele Partikel davon
+    numFullTexParticles         = 200; // so viele Partikel davon
     
     p.assign(numFullTexParticles, customParticle());
     schnipselImgs.resize(numSchnipsel);
@@ -136,7 +139,7 @@ void ofApp::setup(){
     
     
 /**** Snowflakes ****/
-    int numSnowflakes = 10000;
+    int numSnowflakes = 13000;
     pSnowFlakes.resize(numSnowflakes);
     snowFlake.load("snow.png");
     snowFlake.resize(10,10);
@@ -220,6 +223,8 @@ void ofApp::initFullTexParticles(vector <customParticle> &pThis, vector <ofImage
     int numImages = imgThis.size();
     int particleSizeMax = 100; // Pixelsize of Particles
     
+    
+    
    // if(mode == MODE_SNOW){
         for(unsigned int i=0; i < pThis.size(); i++){
             int randNum = ofRandom(numImages);
@@ -233,11 +238,14 @@ void ofApp::initFullTexParticles(vector <customParticle> &pThis, vector <ofImage
             pThis[i].setDrawMode(PARTICLE_MODE_TEXTURES);
             pThis[i].setParticleMode(PARTICLE_MODE_SNOW);
         }
+    
+    ofRandomize(pThis);
+    
    // }
 
 }
 //--------------------------------------------------------------
-void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
+void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis, ofColor &colorThis){
     int textWidth   = imgThis.getWidth();
     int textHeight  = imgThis.getHeight();
     ofPixels pixels = imgThis.getPixels();
@@ -275,7 +283,7 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
                 ofImage pxImage = imgThis;
                 pxImage.crop(i,j,particleResolution,particleResolution);
 
-                pThis[pCount].setColor(ofColor(255,255,255,180));
+                pThis[pCount].setColor(colorThis);
                 pThis[pCount].setParticleImg(pxImage);
                 pThis[pCount].setPos(ofVec3f(i, j, 0));//ofRandom(-100,100)));
                 pThis[pCount].setParticleSize(particleResolution);
@@ -284,6 +292,8 @@ void ofApp::initParticles(vector <customParticle> &pThis, ofImage &imgThis){
         }
         
     }
+    
+    ofRandomize(pThis);
 
 }
 //--------------------------------------------------------------
@@ -314,7 +324,7 @@ void ofApp::resetSchnipsel(){
     for(unsigned int i = 0; i < p.size(); i++){
         p[i].reset();
         p[i].setGlobalPos(ofVec3f(0,0,0));
-        p[i].setDrawMode(PARTICLE_MODE_POINTS);
+        p[i].setDrawMode(PARTICLE_MODE_TEXTURES);
     }
     /**** Snow Flakes ****/
     for(unsigned int i = 0; i < pSnowFlakes.size(); i++){
@@ -367,7 +377,7 @@ if(!bPause){
           for(int j=0; j<gPUpdateSize; j++){
                 int pUpSize;
                 gP[j].relVerseAge++;
-                pUpSize = (gP[j].relVerseAge) * 100;
+                pUpSize = (gP[j].relVerseAge) * 1;
                 if(pUpSize >= gP[j].p.size()) {pUpSize = gP[j].p.size();}
                 if(pUpSize < 0) {pUpSize = 0;}
 
@@ -390,7 +400,20 @@ if(!bPause){
             for(unsigned int i = 0; i < pSnowSize; i++){
                 pSnowFlakes[i].update();
             }
+            
+            if(recordedFrame > scene1_5 && !bPause){
+                
+                int pSize ;
+                pSize = recordedFrame / 1;
+                if(pSize >= p.size()) {pSize = p.size();}
+                for(unsigned int i = 0; i < pSize; i++){
+                    p[i].update();
+                }
+            }
+            
         }
+    
+    
 
     
         recordFbo.getTexture().readToPixels(recordPixels);
@@ -439,10 +462,16 @@ void ofApp::draw(){
             
             texVecGetter.begin();
             ofClear(255,255,255,255);
+            
+            
+            for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
 
             /*** schnipsel ***/
-            for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
+            ofSetColor(255,255,255,140);
+            for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
+            ofSetColor(255,255,255,255);
             
+
             /** Strophen global move **/
             updateFullVerses();
             drawFullVerses(0);
@@ -539,9 +568,11 @@ void ofApp::draw(){
             texVecGetter.begin();
             ofClear(255,255,255,255);
             
-            /*** schnipsel ***/
             for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
-            
+            /*** schnipsel ***/
+            ofSetColor(255,255,255,140);
+            for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
+            ofSetColor(255,255,255,255);
             
             /** Strophen global move **/
             updateFullVerses();
@@ -605,7 +636,7 @@ void ofApp::draw(){
                 if (colTexVecs[i].r > 240) { colTexVecs[i].r = 240;}
                 if (colTexVecs[i].g > 240) { colTexVecs[i].g = 240;}
                 if (colTexVecs[i].b > 240) { colTexVecs[i].b = 240;}
-                if (colTexVecs[i].a < 50) { colTexVecs[i].a = 50;}
+                if (colTexVecs[i].a < 100) { colTexVecs[i].a = 100;}
                 
                 ofSetColor(colTexVecs[i].r, colTexVecs[i].g, colTexVecs[i].b, colTexVecs[i].a);
                 texVecGetter.getTexture().drawSubsection(texVecPosDraw[i].x, texVecPosDraw[i].y, texVecPosDraw[i].z, texVecSize, texVecSize, texVecsPosX[i], texVecsPosY[i], texVecSize, texVecSize);
@@ -617,11 +648,23 @@ void ofApp::draw(){
           
         }
         
+///** Scene 1_5   -  Einzelne Fetzen kommen dazu **/
+//
+//        if(recordedFrame > scene1 && recordedFrame <= scene1_5){
+//            ofSetColor(255,255,255,140);
+//            for(unsigned int i = 0; i < p.size()-1; i++){ p[i].draw(); }
+//
+//        }
+        
 /** Scene 3   -  Strophen bewegen sich, leichte Vis Effects**/
         if(recordedFrame > scene2 && recordedFrame <= scene3){
+            
+            ofSetColor(255,255,255,140);
+            for(unsigned int i = 0; i < (int)p.size()-1; i++){ p[i].draw(); }
+
             /*** schnee ***/
             for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
-
+            
             /** Strophen global move **/
             updateFullVerses();
             drawFullVerses(0);
@@ -633,6 +676,8 @@ void ofApp::draw(){
         if(recordedFrame > scene3 ){
             
             /*** schnipsel ***/
+            ofSetColor(255,255,255,140);
+            for(unsigned int i = 0; i < (int)p.size()-1; i++){ p[i].draw(); }
             for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
             
             //  for(unsigned int i = 0; i < pSnowFlakes.size()-1; i++){ pSnowFlakes[i].draw(); }
@@ -658,7 +703,7 @@ void ofApp::draw(){
             for(int j=0; j<gPUpdateSize; j++){
                 
                 if(!gP[j].bInit){
-                    initParticles(gP[j].p, gP[j].versesImg);
+                    initParticles(gP[j].p, gP[j].versesImg, gP[j].vColorVerse);
                     for (int i=0; i<gP[j].p.size(); i++){
                         gP[j].p[i].setGlobalPos(gP[j].vPosVerse);
                     }
@@ -727,6 +772,10 @@ void ofApp::updateFullVerses(){
         frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06 * i, t*0.002 * i) * 0.9 + 0.78;
         frc.y = fakeWindX * 0.1 + ofSignedNoise(uniqueVal, pos.x * 0.006 + i, t*0.2) * 0.5 - 0.9;
         
+        if(recordedFrame < scene1_5 && i < numGP/6){
+            frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06 * i, t*0.002 * i) * 0.9 - 3;
+        }
+        
         
         float rate = 0.02 + ofNoise(recordedFrame * 0.002, 10 * i) * 0.015;
         gP[i].vPosVerse += ofSignedNoise(ofSignedNoise(recordedFrame * 0.001, rate), ofSignedNoise(recordedFrame * 0.001, rate));
@@ -738,12 +787,22 @@ void ofApp::updateFullVerses(){
         float drag  = ofRandom(0.87, 0.99);
         vel *= drag;
         vel += frc * 0.4 * (1.0 - friction);
-        
-        if(gP[i].vPosVerse.z + vel.z > 10){
-            vel.z = -vel.z;
+       
+        if(recordedFrame < scene1_5 && i < numGP/8){
+            if(gP[i].vPosVerse.z + vel.z > 1000){
+                vel.z = -vel.z;
+            }
+            if(gP[i].vPosVerse.z + vel.z< -1000){
+                vel.z = -vel.z;
+            }
         }
-        if(gP[i].vPosVerse.z + vel.z< -20){
-            vel.z = -vel.z;
+        else{
+            if(gP[i].vPosVerse.z + vel.z > 10){
+                vel.z = -vel.z;
+            }
+            if(gP[i].vPosVerse.z + vel.z< -20){
+                vel.z = -vel.z;
+            }
         }
         
         if(gP[i].vPosVerse.x > fullWidth + gP[i].versesImg.getWidth()){
@@ -772,7 +831,7 @@ void ofApp::drawFullVerses(int startNum){
     float t = recordedFrame/fps;
     
     for(int i=startNum;i< numGP;i++){
-        ofSetColor(255, 180);
+        ofSetColor(gP[i].vColorVerse);
         gP[i].versesImg.draw(gP[i].vPosVerse.x  , gP[i].vPosVerse.y , gP[i].vPosVerse.z );
         
     }

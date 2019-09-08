@@ -21,7 +21,7 @@ enum particleDrawMode{
 enum particleMode{
     PARTICLE_MODE_EXPLODE,
     PARTICLE_MODE_SNOW,
-    PARTICLE_MODE_TEX_GLITCH,
+    PARTICLE_MODE_SCHNIPSEL,
     PARTICLE_MODE_LAYER
 };
 

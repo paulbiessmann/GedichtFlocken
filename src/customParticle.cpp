@@ -106,7 +106,25 @@ void customParticle::reset(){
         rotFrc      = 0.1;
         friction    = 0.4;
         
+    }else if(pMode == PARTICLE_MODE_SCHNIPSEL){
+        
+        pos.x = ofRandom(0, fullWidth);
+        pos.y = ofRandom(fullHeight, fullHeight - 100 - ofRandom(10));
+        pos.z = -10;
+        
+        globalPos = ofVec3f(0,0,0);
+        
+        vel.x = 0;
+        vel.y = 0;
+        vel.z = 0;
+        frc   = ofPoint(0,0,0);
+        
+        rotation    = 0;//ofRandom(-180,180);
+        rotFrc      = 0.1;
+        friction    = 0.4;
+        
     }
+    
     customColor = ofColor(255,255,255,255);
 }
 
@@ -281,6 +299,8 @@ void customParticle::update(){
             }
         }
         
+        
+        
         if( pos.x + vel.x + globalPos.x > fullWidth  ){
             pos.x -= fullWidth;
         }
@@ -371,6 +391,56 @@ void customParticle::update(){
         pos += vel;
         
     
+    }
+    
+    else if(pMode == PARTICLE_MODE_SCHNIPSEL){
+        fakeWindX = ofSignedNoise(pos.x * 0.04, pos.y * 0.09, relTimef * 0.07);
+        friction = 0.79;
+        
+        
+        frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 0.8;
+        frc.x += ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 0.5;
+        frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 + 0.78;
+        frc.y = ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.2) * 0.2 - 0.15;
+        
+        
+        if(relFrameNum > 100){
+            
+            if(pos.y < 1000){
+                frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 - 2.38;
+                frc.x = fakeWindX * 0.25 + ofSignedNoise(uniqueVal, pos.y * 0.04) * 1.8;
+                frc.y = fakeWindX  * 0.2 +  ofNoise(uniqueVal, pos.x * 0.006, relTimef*0.002) * 5.9 - 6.25;
+            }
+            else{
+                frc.x = fakeWindX * 1.5 +ofSignedNoise(uniqueVal, pos.x * 0.06, relTimef*0.2) * 1.9;
+                frc.z = ofSignedNoise(uniqueVal, pos.z * 0.06, relTimef*0.2) * 0.9 + 0.08;
+                frc.y = fakeWindX * ofSignedNoise(uniqueVal, pos.x * 0.006, relTimef*0.02) * 1.9 - 2.75;
+            }
+        }
+        
+        if( pos.z + vel.z < -3000 ){
+            pos.z = 0;
+            pos.y = fullHeight;
+        }
+        if( pos.y + globalPos.y + vel.y > fullHeight + 400 ){
+            pos.y = 0;
+        }
+        if( pos.y + globalPos.y + vel.y < -300 ){
+            pos.y = fullHeight;
+        }
+        if( pos.x + vel.x + globalPos.x > fullWidth  ){
+            pos.x -= fullWidth;
+        }
+        
+        
+        drag  = ofRandom(0.40, 0.99);
+        vel *= drag * 1.19;
+        vel += frc * 0.4 * (1.0 - friction);
+        
+        //2 - UPDATE OUR POSITION
+        pos += vel;
+        
+        
     }
 
     //we do this so as to skip the bounds check for the bottom and make the particles go back to the top of the screen

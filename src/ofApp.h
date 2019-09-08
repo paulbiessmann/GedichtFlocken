@@ -14,6 +14,7 @@ enum sceneMode{
 struct groupParticles {
     vector  <customParticle> p;
     ofVec3f vPosVerse;
+    ofColor vColorVerse;
     int     vNum;
     ofImage versesImg;
     float   uniqueVal;
@@ -32,7 +33,7 @@ class ofApp : public ofBaseApp{
     
     void resetSchnipsel();
     void resetParticles();
-    void initParticles(vector <customParticle>  &pThis, ofImage &imgThis);
+    void initParticles(vector <customParticle>  &pThis, ofImage &imgThis, ofColor &colorThis);
     void initFullTexParticles(vector <customParticle> &pThis, vector <ofImage> &imgThis);
     void initSnowFlakes(vector <customParticle> &pThis, ofImage &imgThis);
     void initTexVecs();

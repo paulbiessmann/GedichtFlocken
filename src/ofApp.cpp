@@ -7,8 +7,8 @@
 float fps = 25;
 
 // struct that contains the Verses, that will explode to particles
-int numGP = 186+30;//186+34;
-groupParticles gP[186+30];
+int numGP = 146;//186;
+groupParticles gP[146];
 
 /*** Wird rückwärts abgespielt, szenen von 4 -> 1 am Ende ***/
 /*     immer < scene. 0 < Szene 1 < scene1; scene1 < Szene 2 < scene2; usw     */
@@ -43,7 +43,7 @@ void ofApp::setup(){
     ofSetFrameRate((int) fps);
     ofSetLogLevel(OF_LOG_VERBOSE);
     
-    fileName = "Flocken_v3-5";
+    fileName = "Flocken_v4";
     fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
     
     // override the default codecs if you like
@@ -79,16 +79,15 @@ void ofApp::setup(){
     for(int i=0; i<numSchnipsel; i++){  fileP[i] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
     for(int i=0; i<numVerses; i++){     fileP[i+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
     for(int i=0; i<numVerses; i++){     fileP[i+numVerses+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numVerses; i++){     fileP[i+2*numVerses+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
+    //for(int i=0; i<numVerses; i++){     fileP[i+2*numVerses+numSchnipsel] = "Strophen/" + ofToString(i+1) + ".png"; }
 
-    for(int i=0; i<numVersN; i++){      fileP[i+3*(numVerses)+numSchnipsel] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVersN; i++){      fileP[i+2*(numVerses)+numSchnipsel] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
 
-    for(int i=0; i<numVersN; i++){      fileP[i+3*(numVerses)+numSchnipsel+numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numVersNadd; i++){   fileP[i+3*(numVerses)+numSchnipsel+2*numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numSchnipsel; i++){  fileP[i+3*(numVerses)+numSchnipsel+2*numVersN+numVersNadd] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
-    for(int i=0; i<numSchnipsel; i++){  fileP[i+3*(numVerses)+2*numSchnipsel+2*numVersN+numVersNadd] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVersN; i++){      fileP[i+2*(numVerses)+numSchnipsel+numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
+//    for(int i=0; i<numVersNadd; i++){   fileP[i+2*(numVerses)+numSchnipsel+2*numVersN] = "StrophenSchnitt/n" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numSchnipsel; i++){  fileP[i+2*(numVerses)+numSchnipsel+2*numVersN] = "Schnipsel/s" + ofToString(i+1) + ".png"; }
 
-    for(int i=0; i<numVerses; i++){     fileP[i+3*numVerses+3*numSchnipsel+2*numVersN+numVersNadd] = "Strophen/" + ofToString(i+1) + ".png"; }
+    for(int i=0; i<numVerses; i++){     fileP[i+2*numVerses+2*numSchnipsel+2*numVersN] = "Strophen/" + ofToString(i+1) + ".png"; }
     
 
     bFirstCallScene3 = true;
@@ -236,7 +235,7 @@ void ofApp::initFullTexParticles(vector <customParticle> &pThis, vector <ofImage
             pThis[i].setParticleImg(imgThis[randNum]);
             pThis[i].setParticleSize(imgWidth, imgHeight);
             pThis[i].setDrawMode(PARTICLE_MODE_TEXTURES);
-            pThis[i].setParticleMode(PARTICLE_MODE_SNOW);
+            pThis[i].setParticleMode(PARTICLE_MODE_SCHNIPSEL);
         }
     
     ofRandomize(pThis);
@@ -360,7 +359,7 @@ if(!bPause){
               relativeFr = recordedFrame;
               bFirstCallScene3 = false;
           }else{
-              gPUpdateSize = (recordedFrame - relativeFr) * 0.06; //0.07
+              gPUpdateSize = (recordedFrame - relativeFr) * 0.2; //0.07
           }
           if(gPUpdateSize >= numGP) {gPUpdateSize = numGP;}
           if(gPUpdateSize < 2) {gPUpdateSize = 1;}
@@ -377,7 +376,7 @@ if(!bPause){
           for(int j=0; j<gPUpdateSize; j++){
                 int pUpSize;
                 gP[j].relVerseAge++;
-                pUpSize = (gP[j].relVerseAge) * 1;
+                pUpSize = (gP[j].relVerseAge) * 3;
                 if(pUpSize >= gP[j].p.size()) {pUpSize = gP[j].p.size();}
                 if(pUpSize < 0) {pUpSize = 0;}
 
@@ -792,7 +791,7 @@ void ofApp::updateFullVerses(){
             if(gP[i].vPosVerse.z + vel.z > 1000){
                 vel.z = -vel.z;
             }
-            if(gP[i].vPosVerse.z + vel.z< -1000){
+            if(gP[i].vPosVerse.z + vel.z< -100){
                 vel.z = -vel.z;
             }
         }
